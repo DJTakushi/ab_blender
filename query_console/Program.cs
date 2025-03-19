@@ -5,10 +5,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()
+        var tags = new Tag<libplctag.DataTypes.TagInfoPlcMapper, libplctag.DataTypes.TagInfo[]>()
         {
             Gateway = "192.168.1.100", // Replace with the actual IP address of your PLC
-            PlcType = PlcType.CompactLogix,
+            PlcType = PlcType.ControlLogix,
             Protocol = Protocol.ab_eip,
             Name = "@tags"
         };
