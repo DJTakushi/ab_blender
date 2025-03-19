@@ -1,26 +1,26 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"workbench.colorTheme": "Gruvbox Dark Hard",
-		// "editor.tabSize": 2,
-		"editor.renderWhitespace": "all",
-		"editor.rulers": [
-			{
-				"column": 80,
-				"color": "#80ffff"
-			},
-		],
-		"editor.detectIndentation": false,
-		"[python]": {
-			"editor.defaultFormatter": "ms-python.autopep8"
-		},
-		"autopep8.args": [
-			"--indent-size=2",
-			"--ignore=E121"
-		]
-	},
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "workbench.colorTheme": "Gruvbox Dark Hard",
+        // "editor.tabSize": 2,
+        "editor.renderWhitespace": "all",
+        "editor.rulers": [
+            {
+                "column": 80,
+                "color": "#80ffff"
+            },
+        ],
+        "editor.detectIndentation": false,
+        "[python]": {
+            "editor.defaultFormatter": "ms-python.autopep8"
+        },
+        "autopep8.args": [
+            "--indent-size=2",
+            "--ignore=E121"
+        ]
+    },
 }
