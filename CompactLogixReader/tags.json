@@ -1,0 +1,17 @@
+[
+    {
+        "Name": "Temperature",
+        "DataType": "float32",
+        "Path": "192.168.1.100,1,0"
+    },
+    {
+        "Name": "Running",
+        "DataType": "bool",
+        "Path": "192.168.1.100,1,0"
+    },
+    {
+        "Name": "Counter",
+        "DataType": "int32",
+        "Path": "192.168.1.100,1,0"
+    }
+]
