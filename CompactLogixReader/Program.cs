@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using LibplctagWrapper;
+using libplctag;
 using RabbitMQ.Client;
 using System.Timers;
 
@@ -171,7 +171,7 @@ namespace CompactLogixReader
             }
         }
 
-        private static DataType ConvertToLibPlcTagDataType(string dataType)
+        private static string ConvertToLibPlcTagDataType(string dataType)
         {
             return dataType.ToLower() switch
             {
