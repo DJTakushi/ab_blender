@@ -143,24 +143,29 @@ class Program
                 var timestamp = DateTime.UtcNow;
                 var tagData = new Dictionary<string, object>();
 
-                foreach (var tag in _tags)
+                Console.WriteLine($"_tags.Length : {_tags.Length}");
+                if (_tags.Length > 0)
                 {
-                    tag.Read();
 
-                    object value = tag.ElementType switch
+                    foreach (var tag in _tags)
                     {
-                        TagDataType.INT => tag.GetInt16(0),
-                        TagDataType.DINT => tag.GetInt32(0),
-                        TagDataType.REAL => tag.GetFloat32(0),
-                        _ => tag.GetString(0)
-                    };
+                        tag.Read();
 
-                    if (_knownTags.Add(tag.Name))
-                    {
-                        Console.WriteLine($"New tag discovered: {tag.Name} = {value}");
+                        object value = tag.ElementType switch
+                        {
+                //             TagDataType.INT => tag.GetInt16(0),
+                //             TagDataType.DINT => tag.GetInt32(0),
+                //             TagDataType.REAL => tag.GetFloat32(0),
+                //             _ => tag.GetString(0)
+                        };
+
+                //         if (_knownTags.Add(tag.Name))
+                //         {
+                //             Console.WriteLine($"New tag discovered: {tag.Name} = {value}");
+                //         }
+
+                //         tagData[tag.Name] = value;
                     }
-
-                    tagData[tag.Name] = value;
                 }
 
                 if (_isRabbitMQConnected && _rabbitMQChannel != null)
