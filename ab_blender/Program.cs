@@ -130,7 +130,7 @@ class Program
                     {
                         Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
                     }
-                    data["tags"][tag.Name] =  f;
+                    data["tags"][tag.Name] = f;
                     break;
                 default:
                     Console.WriteLine($"Unknown type : {tag.DataType}");
@@ -210,7 +210,7 @@ class Program
 
 class TagDefinition
 {
-    public string Name { get; set; }
-    public string DataType { get; set; }
-    public string Path { get; set; }
+    public string? Name { get; set; }
+    public string? DataType { get; set; }
+    public string? Path { get; set; }
 }
