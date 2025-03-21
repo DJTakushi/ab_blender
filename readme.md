@@ -1,5 +1,35 @@
 # 1. use
 
+## 1.1 environment vars
+see *example.env*
+```
+PLC_IP=192.168.1.100
+READ_TAGS_PERIOD_MS=1000
+RABBITMQ_HOST=192.168.130.51
+RABBITMQ_USER=guest
+RABBITMQ_PASS=guest
+RABBITMQ_EXCHANGE=plc_data
+RABBITMQ_ROUTING_KEY=tag_values
+RABBITMQ_RECONNECTION_PERIOD_MS=5000
+```
+
+## 1.2 local
+from root dir
+```
+dotnet run --project ab_blender
+```
+
+## 1.3 containerization
+### 1.3.1 build
+```
+dotnet publish --arch x64 /t:PublishContainer
+```
+
+###  1.3.2  run 
+```
+docker run --env-file example.env ab_blender
+```
+
 # 2. functionality
 
 # 3. requirements
