@@ -2,8 +2,6 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "query_conole", "query_console\query_conole.csproj", "{1FC06D23-AD78-FECE-AF5F-8FC65D9F74EB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ab_blender", "ab_blender\ab_blender.csproj", "{EEC48A42-129C-4440-B411-85D2592BFC37}"
 EndProject
 Global
@@ -12,10 +10,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1FC06D23-AD78-FECE-AF5F-8FC65D9F74EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1FC06D23-AD78-FECE-AF5F-8FC65D9F74EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1FC06D23-AD78-FECE-AF5F-8FC65D9F74EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1FC06D23-AD78-FECE-AF5F-8FC65D9F74EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EEC48A42-129C-4440-B411-85D2592BFC37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EEC48A42-129C-4440-B411-85D2592BFC37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEC48A42-129C-4440-B411-85D2592BFC37}.Release|Any CPU.ActiveCfg = Release|Any CPU
