@@ -15,6 +15,9 @@ class Program
     private static System.Timers.Timer _reconnectTimer;
     private static readonly string _appVersion = "1.0.0";
     private static string plc_address;
+    private static string _rmq_exchange;
+    private static string _rmq_rk;
+
     static async Task Main(string[] args)
     {
         // Load tags from JSON file
@@ -133,8 +136,8 @@ class Program
         {
             var body = System.Text.Encoding.UTF8.GetBytes(jsonMessage);
             _rabbitChannel.BasicPublish(
-                exchange: Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE"),
-                        routingKey: Environment.GetEnvironmentVariable("RABBITMQ_ROUTING_KEY"),
+                exchange: _rmq_exchange,
+                        routingKey: _rmq_rk,
                         basicProperties: null,
                         body: body);
         }
@@ -165,8 +168,12 @@ class Program
                 AutomaticRecoveryEnabled = true
             };
 
-            _rabbitConnection = factory.CreateConnection();
+            _rabbitConnection = factory.CreateConnection("ab_blender");
             _rabbitChannel = _rabbitConnection.CreateModel();
+            _rmq_exchange = Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE");
+            _rabbitChannel.ExchangeDeclare(_rmq_exchange, "topic");
+            _rmq_rk = Environment.GetEnvironmentVariable("RABBITMQ_ROUTING_KEY");
+
             Console.WriteLine("Connected to RabbitMQ");
         }
         catch (Exception ex)
