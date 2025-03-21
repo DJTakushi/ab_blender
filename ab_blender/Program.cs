@@ -23,10 +23,10 @@ class Program
         // Initialize PLC tags
         InitializePlcTags();
 
-        plc_address = Environment.GetEnvironmentVariable("PLC_ADDRESS");
+        plc_address = Environment.GetEnvironmentVariable("PLC_IP");
         if (string.IsNullOrEmpty(plc_address))
         {
-            Console.WriteLine($"PLC_ADDRESS environment variable not set; exiting...");
+            Console.WriteLine($"PLC_IP environment variable not set; exiting...");
             Environment.Exit(1);
         }
         Console.WriteLine($"plc_address : {plc_address}");
