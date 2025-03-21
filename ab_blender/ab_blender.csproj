@@ -11,7 +11,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-        <PackageReference Include="libplctag" Version="1.5.2" />
+        <PackageReference Include="libplctag" Version="1.6.0-alpha.4" />
         <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
     </ItemGroup>
-</Project>
+</Project> 
