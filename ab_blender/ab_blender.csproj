@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-ab_blender-556b80d3-0fad-477c-bf37-826c609c8e2d</UserSecretsId>
         <ContainerRepository>ab_blender</ContainerRepository>
-
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
