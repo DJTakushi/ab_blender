@@ -37,7 +37,7 @@ class Program
         // Setup tag reading timer
         double readPeriodMs = double.Parse(Environment.GetEnvironmentVariable("READ_TAGS_PERIOD_MS") ?? "1000");
         _readTimer = new System.Timers.Timer(readPeriodMs);
-        _readTimer.Elapsed += ReadTags;
+        _readTimer.Elapsed += ReadTags!;
         _readTimer.AutoReset = true;
 
         // Setup RabbitMQ if environment variables are present
@@ -94,13 +94,14 @@ class Program
         foreach (var tag in _tags)
         {
             // data["tags"][tag.Name].Read(); TODO : activate this to read from PLC
+            Tag this_plc_tag = _plcTags[tag.Name]!;
             switch (tag.DataType)
             {
                 case "bool":
                     bool b = false;
                     try
                     {
-                        b = _plcTags[tag.Name].GetBit(0); // TODO : this breaks in my testing
+                        b = this_plc_tag.GetBit(0); // TODO : this breaks in my testing
                     }
                     catch (Exception ex)
                     {
@@ -112,7 +113,7 @@ class Program
                     int i32 = 0;
                     try
                     {
-                        i32 = _plcTags[tag.Name].GetInt32(0);// TODO : this breaks in my testing
+                        i32 = this_plc_tag.GetInt32(0);// TODO : this breaks in my testing
                     }
                     catch (Exception ex)
                     {
@@ -124,7 +125,7 @@ class Program
                     double f = 0.0;
                     try
                     {
-                        f = _plcTags[tag.Name].GetFloat32(0);
+                        f = this_plc_tag.GetFloat32(0);
                     }
                     catch (Exception ex)
                     {
