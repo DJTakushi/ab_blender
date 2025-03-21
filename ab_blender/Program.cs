@@ -121,7 +121,16 @@ class Program
                     data["tags"][tag.Name] = i32;
                     break;
                 case "float32":
-                    data["tags"][tag.Name] = _plcTags[tag.Name].GetFloat32(0);
+                    double f = 0.0;
+                    try
+                    {
+                        f = _plcTags[tag.Name].GetFloat32(0);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
+                    }
+                    data["tags"][tag.Name] =  f;
                     break;
                 default:
                     Console.WriteLine($"Unknown type : {tag.DataType}");
