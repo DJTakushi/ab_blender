@@ -78,7 +78,7 @@ class Program
                 Protocol = Protocol.ab_eip
             };
             // tag.Initialize(); // TODO : init tags
-            _plcTags.Add(tagDef.Name, tag);
+            _plcTags.Add(tagDef.Name!, tag);
         }
     }
 
@@ -94,7 +94,7 @@ class Program
         foreach (var tag in _tags)
         {
             // data["tags"][tag.Name].Read(); TODO : activate this to read from PLC
-            Tag this_plc_tag = _plcTags[tag.Name]!;
+            Tag this_plc_tag = _plcTags[tag.Name!];
             switch (tag.DataType)
             {
                 case "bool":
@@ -107,7 +107,7 @@ class Program
                     {
                         Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
                     }
-                    data["tags"][tag.Name] = b;
+                    data["tags"]![tag.Name!] = b;
                     break;
                 case "int32":
                     int i32 = 0;
@@ -119,7 +119,7 @@ class Program
                     {
                         Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
                     }
-                    data["tags"][tag.Name] = i32;
+                    data["tags"]![tag.Name!] = i32;
                     break;
                 case "float32":
                     double f = 0.0;
@@ -131,7 +131,7 @@ class Program
                     {
                         Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
                     }
-                    data["tags"][tag.Name] = f;
+                    data["tags"]![tag.Name!] = f;
                     break;
                 default:
                     Console.WriteLine($"Unknown type : {tag.DataType}");
@@ -202,7 +202,7 @@ class Program
             await SetupRabbitMq();
             if (_rabbitChannel?.IsOpen == true)
             {
-                _reconnectTimer.Stop();
+                _reconnectTimer?.Stop();
                 Console.WriteLine("RabbitMQ reconnected successfully");
             }
         }
