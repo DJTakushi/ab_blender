@@ -1,16 +1,116 @@
 [
     {
-        "Name": "Temperature",
+        "Name": "TreatingPressure_psi",
         "DataType": "float32",
         "Path": "1,0"
     },
     {
-        "Name": "Running",
+        "Name": "SecondaryPressure_psi",
         "DataType": "float32",
         "Path": "1,0"
     },
     {
-        "Name": "Counter",
+        "Name": "DeadStringPressure_psi",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "SuctionRate1_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "SuctionRate2_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "SuctionRate3_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "DischargeRate1_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "DischargeRate2_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "DischargeRate3_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "AdditiveRate1_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "AdditiveRate2_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "AdditiveRate3_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "AdditiveRate4_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "AdditiveRate5_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "AdditiveRate6_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "AdditiveRate7_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "AdditiveRate8_bpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "ProppantRate_ppm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "ProppantAugerRate1_rpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "ProppantAugerRate2_rpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "ProppantAugerRate3_rpm",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "Concentration_ppga",
+        "DataType": "float32",
+        "Path": "1,0"
+    },
+    {
+        "Name": "Density_ppg",
         "DataType": "float32",
         "Path": "1,0"
     }
