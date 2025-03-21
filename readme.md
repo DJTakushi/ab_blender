@@ -27,7 +27,7 @@ dotnet publish --arch x64 /t:PublishContainer
 
 ###  1.3.2  run 
 ```
-docker run --env-file example.env ab_blender
+docker run --env-file .env ab_blender
 ```
 
 # 2. functionality
