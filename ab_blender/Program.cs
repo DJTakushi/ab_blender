@@ -9,14 +9,14 @@ class Program
     private static List<TagDefinition> _tags = new();
     private static Dictionary<string, Tag> _plcTags = new Dictionary<string, Tag>();
     private static HashSet<string> _printedTags = new();
-    private static IConnection _rabbitConnection;
-    private static IModel _rabbitChannel;
-    private static System.Timers.Timer _readTimer;
-    private static System.Timers.Timer _reconnectTimer;
+    private static IConnection? _rabbitConnection;
+    private static IModel? _rabbitChannel;
+    private static System.Timers.Timer? _readTimer;
+    private static System.Timers.Timer? _reconnectTimer;
     private static readonly string _appVersion = "1.0.0";
-    private static string plc_address;
-    private static string _rmq_exchange;
-    private static string _rmq_rk;
+    private static string? plc_address;
+    private static string? _rmq_exchange;
+    private static string? _rmq_rk;
 
     static async Task Main(string[] args)
     {
@@ -26,7 +26,7 @@ class Program
         // Initialize PLC tags
         InitializePlcTags();
 
-        plc_address = Environment.GetEnvironmentVariable("PLC_IP");
+        plc_address = Environment.GetEnvironmentVariable("PLC_IP")!;
         if (string.IsNullOrEmpty(plc_address))
         {
             Console.WriteLine($"PLC_IP environment variable not set; exiting...");
