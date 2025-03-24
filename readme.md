@@ -34,21 +34,22 @@ docker run --env-file .env ab_blender
 ## 2.1 functionality
 :::mermaid
 flowchart TD
-    tags.json@{ shape: doc}
-    style tags.json fill:#0000FF
+    tags.json>tags.json]
+    style tags.json fill:#0000FF,color:#fff
 
-    plc@{ shape : card, label: "Allen Bradley PLC"}
-    style plc fill:#ff0000
+    plc[/Allen Bradley PLC/]
+    style plc fill:#ff0000,color:#fff
 
-    console@{ shape: div-rect}
-    style console fill:#000000
+    console[[console]]
+    style console fill:#000000,color:#fff
 
+    env_var{{env vars}}
     style rmq fill:#ff6600,stroke:#b8b8b8,stroke-width:2px,color:#fff
-    style env_var fill:green
+    style env_var fill:green,color:#fff
 
     subgraph ab_blender
         tags_
-        tags_ --> is_rmq@{ shape: diamond, label: "rmq?"}
+        tags_ --> is_rmq{rmq?}
     end
 
     tags.json --> tags_
