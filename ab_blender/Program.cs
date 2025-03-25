@@ -17,6 +17,7 @@ class Program
     private const string RABBITMQ_EXCHANGE = "RABBITMQ_EXCHANGE";
     private const string RABBITMQ_ROUTING_KEY = "RABBITMQ_ROUTING_KEY";
     private const string RABBITMQ_RECONNECTION_PERIOD_MS = "RABBITMQ_RECONNECTION_PERIOD_MS";
+    private const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
 
     private static List<TagDefinition> _tags = new();
     private static Dictionary<string, Tag> _plcTags = new Dictionary<string, Tag>();
@@ -182,7 +183,8 @@ class Program
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_USER)) &&
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_PASS)) &&
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY));
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_CONNECTION_NAME));
     }
 
     private static async Task SetupRabbitMq()
@@ -197,7 +199,7 @@ class Program
                 AutomaticRecoveryEnabled = true
             };
 
-            _rabbitConnection = factory.CreateConnection("ab_blender");
+            _rabbitConnection = factory.CreateConnection(Environment.GetEnvironmentVariable(RABBITMQ_CONNECTION_NAME));
             _rabbitChannel = _rabbitConnection.CreateModel();
             _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE);
             _rabbitChannel.ExchangeDeclare(_rmq_exchange, "topic");
