@@ -8,7 +8,6 @@ class Program
 {
     private static List<TagDefinition> _tags = new();
     private static Dictionary<string, Tag> _plcTags = new Dictionary<string, Tag>();
-    private static HashSet<string> _printedTags = new();
     private static IConnection? _rabbitConnection;
     private static IModel? _rabbitChannel;
     private static System.Timers.Timer? _readTimer;
