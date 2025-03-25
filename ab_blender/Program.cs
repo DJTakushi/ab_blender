@@ -22,7 +22,7 @@ class Program
     private static List<TagDefinition> _tags = new();
     private static Dictionary<string, Tag> _plcTags = new Dictionary<string, Tag>();
     private static IConnection? _rabbitConnection;
-    private static IModel? _rabbitChannel;
+    private static IChannel? _rabbitChannel;
     private static System.Timers.Timer? _readTimer;
     private static System.Timers.Timer? _reconnectTimer;
     private static readonly string _appVersion = "1.0.0";
@@ -51,7 +51,7 @@ class Program
         // Setup tag reading timer
         double readPeriodMs = double.Parse(Environment.GetEnvironmentVariable(READ_TAGS_PERIOD_MS) ?? "1000");
         _readTimer = new System.Timers.Timer(readPeriodMs);
-        _readTimer.Elapsed += ReadTags!;
+        _readTimer.Elapsed += async (s,e) => await ReadTags();
         _readTimer.AutoReset = true;
 
         // Setup RabbitMQ if environment variables are present
@@ -99,7 +99,7 @@ class Program
         }
     }
 
-    private static void ReadTags(object sender, ElapsedEventArgs e)
+    private static async Task ReadTags()
     {
         JsonNode data = new JsonObject();
         data["timestamp"] = DateTime.UtcNow.ToString("O");
@@ -165,10 +165,12 @@ class Program
         if (_rabbitChannel?.IsOpen == true)
         {
             var body = System.Text.Encoding.UTF8.GetBytes(jsonMessage);
-            _rabbitChannel.BasicPublish(
-                exchange: _rmq_exchange,
-                        routingKey: _rmq_rk,
-                        basicProperties: null,
+            var props = new BasicProperties();
+            await _rabbitChannel.BasicPublishAsync(
+                exchange: _rmq_exchange!,
+                        routingKey: _rmq_rk!,
+                        mandatory: false,
+                        basicProperties: props,
                         body: body);
         }
         else
@@ -193,16 +195,16 @@ class Program
         {
             var factory = new ConnectionFactory
             {
-                HostName = Environment.GetEnvironmentVariable(RABBITMQ_HOST),
-                UserName = Environment.GetEnvironmentVariable(RABBITMQ_USER),
-                Password = Environment.GetEnvironmentVariable(RABBITMQ_PASS),
+                HostName = Environment.GetEnvironmentVariable(RABBITMQ_HOST)!,
+                UserName = Environment.GetEnvironmentVariable(RABBITMQ_USER)!,
+                Password = Environment.GetEnvironmentVariable(RABBITMQ_PASS)! ,
                 AutomaticRecoveryEnabled = true
             };
 
-            _rabbitConnection = factory.CreateConnection(Environment.GetEnvironmentVariable(RABBITMQ_CONNECTION_NAME));
-            _rabbitChannel = _rabbitConnection.CreateModel();
-            _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE);
-            _rabbitChannel.ExchangeDeclare(_rmq_exchange, "topic");
+            _rabbitConnection = await factory.CreateConnectionAsync();
+            _rabbitChannel = await _rabbitConnection.CreateChannelAsync();
+            _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)!;
+            await _rabbitChannel.ExchangeDeclareAsync(_rmq_exchange, "topic");
             _rmq_rk = Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY);
 
             Console.WriteLine("Connected to RabbitMQ");
@@ -219,7 +221,11 @@ class Program
         if (_rabbitChannel?.IsOpen != true)
         {
             Console.WriteLine("Attempting to reconnect to RabbitMQ...");
-            _rabbitConnection?.Close();
+            if (_rabbitConnection != null)
+            {
+                await _rabbitConnection.CloseAsync();
+                await _rabbitConnection.DisposeAsync();
+            }
             await SetupRabbitMq();
             if (_rabbitChannel?.IsOpen == true)
             {
