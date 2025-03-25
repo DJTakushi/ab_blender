@@ -12,7 +12,7 @@
 
 # 1. functionality
 ## 1.1 functionality
-::: mermaid
+``` mermaid
 flowchart TD
     tags.json>tags.json]
     style tags.json fill:#0000FF,color:#fff
@@ -37,7 +37,7 @@ flowchart TD
     plc <-- allen-bradley protocol --> tags_
     is_rmq  -- yes --> rmq[(rmq)]
     is_rmq -- no --> console
-:::
+```
 
 ## 1.2 structure
 :::mermaid
