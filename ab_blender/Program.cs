@@ -18,6 +18,7 @@ class Program
     private static string? _rmq_rk;
     private static readonly PlcType _plc_type = GetPlcType();
     private static readonly Protocol _plc_protocol = GetPlcProtocol();
+    private static readonly bool _stub_plc = GetPlcStub();
     static async Task Main(string[] args)
     {
         // Load tags from JSON file
@@ -77,7 +78,10 @@ class Program
                 PlcType = _plc_type,
                 Protocol = _plc_protocol
             };
-            // tag.Initialize(); // TODO : init tags
+            if (!_stub_plc)
+            {
+                tag.Initialize();
+            }
             _plcTags.Add(tagDef.Name!, tag);
         }
     }
@@ -93,7 +97,9 @@ class Program
 
         foreach (var tag in _tags)
         {
-            // data["tags"][tag.Name].Read(); TODO : activate this to read from PLC
+            if (!_stub_plc){
+                _plcTags[tag.Name].Read();
+            }
             Tag this_plc_tag = _plcTags[tag.Name!];
             switch (tag.DataType)
             {
@@ -206,6 +212,19 @@ class Program
                 Console.WriteLine("RabbitMQ reconnected successfully");
             }
         }
+    }
+
+    private static bool GetPlcStub()
+    {
+        string? stub_plc_s = Environment.GetEnvironmentVariable("STUB_PLC");
+        if (!string.IsNullOrEmpty(stub_plc_s))
+        {
+            if(stub_plc_s == "true"){
+                Console.WriteLine($"STUB_PLC set ; stubbing PLC interactions");
+                return true;
+            }
+        }
+        return false;
     }
 
     private static PlcType GetPlcType()
