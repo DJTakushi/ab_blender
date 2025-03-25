@@ -101,10 +101,12 @@ class Program
 
     private static async Task ReadTags()
     {
-        JsonNode data = new JsonObject();
-        data["timestamp"] = DateTime.UtcNow.ToString("O");
-        data["app_version"] = _appVersion;
-        data["tags"] = new JsonObject();
+        JsonNode data = new JsonObject
+        {
+            ["timestamp"] = DateTime.UtcNow.ToString("O"),
+            ["app_version"] = _appVersion,
+            ["tags"] = new JsonObject()
+        };
 
         var timestamp = DateTime.UtcNow;
 
