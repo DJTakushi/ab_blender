@@ -48,17 +48,17 @@ stateDiagram-v2
 
 [*] --> LoadTagsFromJson()
 state LoadTagsFromJson()  {
-    state "_tags Deserialized from 'tags.json'" as tags
+    state "_tags Deserialized <br>from 'tags.json'" as tags
 }
 
 LoadTagsFromJson() --> InitializePlcTags()
 state  InitializePlcTags() {
-    state "loop through _tags, create real tags in _plcTags, and init them" as init
+    state "loop through _tags, create<br>real tags in _plcTags,<br> and init them" as init
 }   
 
 state "_readTime setup" as _readTimer_setup  {
     state "_readTimer creation" as _readTimer
-    state "_readTimer.Elapsed += ReadTags" as  set_readtags
+    state "_readTimer.Elapsed<br>+= ReadTags" as  set_readtags
     _readTimer --> set_readtags
 }
 InitializePlcTags() --> _readTimer_setup
@@ -70,7 +70,7 @@ state rmq_reconnection_setup{
     state "_reconnectTimer creation" as _reconnectTimer
     SetupRabbitMq() --> _reconnectTimer
 
-    state "_reconnectTimer.Elapsed += ReconnectRabbitMq()" as reconnect_elapsed
+    state "_reconnectTimer.Elapsed<br>+= ReconnectRabbitMq()" as reconnect_elapsed
     _reconnectTimer --> reconnect_elapsed
 }
 rmq_reconnection_setup -->  _readTimer.Start()
