@@ -19,8 +19,8 @@ class Program
     private const string RABBITMQ_RECONNECTION_PERIOD_MS = "RABBITMQ_RECONNECTION_PERIOD_MS";
     private const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
 
-    private static List<TagDefinition> _tags = new();
-    private static Dictionary<string, Tag> _plcTags = new Dictionary<string, Tag>();
+    private static List<TagDefinition> _tags = [];
+    private static readonly Dictionary<string, Tag> _plcTags = [];
     private static IConnection? _rabbitConnection;
     private static IChannel? _rabbitChannel;
     private static System.Timers.Timer? _readTimer;
