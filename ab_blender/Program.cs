@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using libplctag;
 using RabbitMQ.Client;
-using System.Timers;
 using System.Text.Json.Nodes;
 
 class Program
