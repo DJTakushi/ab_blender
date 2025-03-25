@@ -131,7 +131,7 @@ dotnet publish --arch x64 /t:PublishContainer
 
 add to `tmvcontainer.azurecr.io` registry with tag `0.0.00000`
 ```
-dotnet publish --os linux --arch x64 /t:PublishContainer -p ContainerRegistry=tmvcontainer.azurecr.io -p ContainerImageTag=0.0.00000
+dotnet publish --arch x64 /t:PublishContainer -p ContainerRegistry=tmvcontainer.azurecr.io -p ContainerImageTag=0.0.00000
 ```
 
 ###  2.3.2 run
