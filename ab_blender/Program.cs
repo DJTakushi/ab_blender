@@ -6,6 +6,18 @@ using System.Text.Json.Nodes;
 
 class Program
 {
+    private const string PLC_IP = "PLC_IP";
+    private const string PLC_TYPE = "PLC_TYPE";
+    private const string PLC_PROTOCOL = "PLC_PROTOCOL";
+    private const string STUB_PLC = "STUB_PLC";
+    private const string READ_TAGS_PERIOD_MS = "READ_TAGS_PERIOD_MS";
+    private const string RABBITMQ_HOST = "RABBITMQ_HOST";
+    private const string RABBITMQ_USER = "RABBITMQ_USER";
+    private const string RABBITMQ_PASS = "RABBITMQ_PASS";
+    private const string RABBITMQ_EXCHANGE = "RABBITMQ_EXCHANGE";
+    private const string RABBITMQ_ROUTING_KEY = "RABBITMQ_ROUTING_KEY";
+    private const string RABBITMQ_RECONNECTION_PERIOD_MS = "RABBITMQ_RECONNECTION_PERIOD_MS";
+
     private static List<TagDefinition> _tags = new();
     private static Dictionary<string, Tag> _plcTags = new Dictionary<string, Tag>();
     private static IConnection? _rabbitConnection;
@@ -27,16 +39,16 @@ class Program
         // Initialize PLC tags
         InitializePlcTags();
 
-        plc_address = Environment.GetEnvironmentVariable("PLC_IP")!;
+        plc_address = Environment.GetEnvironmentVariable(PLC_IP)!;
         if (string.IsNullOrEmpty(plc_address))
         {
-            Console.WriteLine($"PLC_IP environment variable not set; exiting...");
+            Console.WriteLine($"{PLC_IP} environment variable not set; exiting...");
             Environment.Exit(1);
         }
         Console.WriteLine($"plc_address : {plc_address}");
 
         // Setup tag reading timer
-        double readPeriodMs = double.Parse(Environment.GetEnvironmentVariable("READ_TAGS_PERIOD_MS") ?? "1000");
+        double readPeriodMs = double.Parse(Environment.GetEnvironmentVariable(READ_TAGS_PERIOD_MS) ?? "1000");
         _readTimer = new System.Timers.Timer(readPeriodMs);
         _readTimer.Elapsed += ReadTags!;
         _readTimer.AutoReset = true;
@@ -45,7 +57,7 @@ class Program
         if (HasRabbitMqConfig())
         {
             await SetupRabbitMq();
-            double reconnectPeriodMs = double.Parse(Environment.GetEnvironmentVariable("RABBITMQ_RECONNETION_PERIOD_MS") ?? "5000");
+            double reconnectPeriodMs = double.Parse(Environment.GetEnvironmentVariable(RABBITMQ_RECONNECTION_PERIOD_MS) ?? "5000");
             _reconnectTimer = new System.Timers.Timer(reconnectPeriodMs);
             _reconnectTimer.Elapsed += async (s, e) => await ReconnectRabbitMq();
             _reconnectTimer.AutoReset = true;
@@ -97,7 +109,8 @@ class Program
 
         foreach (var tag in _tags)
         {
-            if (!_stub_plc){
+            if (!_stub_plc)
+            {
                 _plcTags[tag.Name].Read();
             }
             Tag this_plc_tag = _plcTags[tag.Name!];
@@ -165,11 +178,11 @@ class Program
 
     private static bool HasRabbitMqConfig()
     {
-        return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RABBITMQ_HOST")) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RABBITMQ_USER")) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RABBITMQ_PASS")) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE")) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RABBITMQ_ROUTING_KEY"));
+        return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_HOST)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_USER)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_PASS)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY));
     }
 
     private static async Task SetupRabbitMq()
@@ -178,17 +191,17 @@ class Program
         {
             var factory = new ConnectionFactory
             {
-                HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST"),
-                UserName = Environment.GetEnvironmentVariable("RABBITMQ_USER"),
-                Password = Environment.GetEnvironmentVariable("RABBITMQ_PASS"),
+                HostName = Environment.GetEnvironmentVariable(RABBITMQ_HOST),
+                UserName = Environment.GetEnvironmentVariable(RABBITMQ_USER),
+                Password = Environment.GetEnvironmentVariable(RABBITMQ_PASS),
                 AutomaticRecoveryEnabled = true
             };
 
             _rabbitConnection = factory.CreateConnection("ab_blender");
             _rabbitChannel = _rabbitConnection.CreateModel();
-            _rmq_exchange = Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE");
+            _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE);
             _rabbitChannel.ExchangeDeclare(_rmq_exchange, "topic");
-            _rmq_rk = Environment.GetEnvironmentVariable("RABBITMQ_ROUTING_KEY");
+            _rmq_rk = Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY);
 
             Console.WriteLine("Connected to RabbitMQ");
         }
@@ -216,11 +229,12 @@ class Program
 
     private static bool GetPlcStub()
     {
-        string? stub_plc_s = Environment.GetEnvironmentVariable("STUB_PLC");
+        string? stub_plc_s = Environment.GetEnvironmentVariable(STUB_PLC);
         if (!string.IsNullOrEmpty(stub_plc_s))
         {
-            if(stub_plc_s == "true"){
-                Console.WriteLine($"STUB_PLC set ; stubbing PLC interactions");
+            if (stub_plc_s == "true")
+            {
+                Console.WriteLine($"{STUB_PLC} set ; stubbing PLC interactions");
                 return true;
             }
         }
@@ -229,10 +243,10 @@ class Program
 
     private static PlcType GetPlcType()
     {
-        string? plc_str = Environment.GetEnvironmentVariable("PLC_TYPE");
+        string? plc_str = Environment.GetEnvironmentVariable(PLC_TYPE);
         if (string.IsNullOrEmpty(plc_str))
         {
-            Console.WriteLine($"PLC_TYPE environment variable not set; exiting...");
+            Console.WriteLine($"{PLC_TYPE} environment variable not set; exiting...");
             Environment.Exit(1);
         }
         Dictionary<string, PlcType> plc_type_rev = new Dictionary<string, PlcType>{
@@ -246,17 +260,17 @@ class Program
         };
         if (!plc_type_rev.TryGetValue(plc_str, out PlcType plc_type))
         {
-            Console.WriteLine($"Invalid PLC_TYPE ; value : {plc_str}, but valid values are {string.Join(", ",plc_type_rev.Keys)}");
+            Console.WriteLine($"Invalid {PLC_TYPE} ; value : {plc_str}, but valid values are {string.Join(", ", plc_type_rev.Keys)}");
             Environment.Exit(1);
         }
         return plc_type;
     }
     private static Protocol GetPlcProtocol()
     {
-        string? protocol_str = Environment.GetEnvironmentVariable("PLC_PROTOCOL");
+        string? protocol_str = Environment.GetEnvironmentVariable(PLC_PROTOCOL);
         if (string.IsNullOrEmpty(protocol_str))
         {
-            Console.WriteLine($"PLC_PROTOCOL environment variable not set; exiting...");
+            Console.WriteLine($"{PLC_PROTOCOL} environment variable not set; exiting...");
             Environment.Exit(1);
         }
         Dictionary<string, Protocol> protocol_rev = new Dictionary<string, Protocol>{
@@ -265,7 +279,7 @@ class Program
         };
         if (!protocol_rev.TryGetValue(protocol_str, out Protocol protocol))
         {
-            Console.WriteLine($"Invalid PLC_PROTOCOL ; value : {protocol_str}, but valid values are {string.Join(", ",protocol_rev.Keys)}");
+            Console.WriteLine($"Invalid {PLC_PROTOCOL} ; value : {protocol_str}, but valid values are {string.Join(", ", protocol_rev.Keys)}");
             Environment.Exit(1);
         }
         return protocol;
