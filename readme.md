@@ -37,7 +37,6 @@ flowchart TD
     plc <-- allen-bradley protocol --> tags_
     is_rmq  -- yes --> rmq[(rmq)]
     is_rmq -- no --> console
-
 :::
 
 ## 1.2 structure
