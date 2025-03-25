@@ -259,7 +259,8 @@ class Program
             Console.WriteLine($"{PLC_TYPE} environment variable not set; exiting...");
             Environment.Exit(1);
         }
-        Dictionary<string, PlcType> plc_type_rev = new Dictionary<string, PlcType>{
+        Dictionary<string, PlcType> plc_type_rev = new()
+        {
             { "ControlLogix", PlcType.ControlLogix },
             { "Plc5", PlcType.Plc5 },
             { "Slc500", PlcType.Slc500 },
@@ -283,7 +284,8 @@ class Program
             Console.WriteLine($"{PLC_PROTOCOL} environment variable not set; exiting...");
             Environment.Exit(1);
         }
-        Dictionary<string, Protocol> protocol_rev = new Dictionary<string, Protocol>{
+        Dictionary<string, Protocol> protocol_rev = new()
+        {
             { "ab_eip", Protocol.ab_eip },
             { "modbus_tcp", Protocol.modbus_tcp }
         };
