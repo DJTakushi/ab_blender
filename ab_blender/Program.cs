@@ -17,6 +17,7 @@ class Program
     private static string? _rmq_exchange;
     private static string? _rmq_rk;
     private static readonly PlcType _plc_type = GetPlcType();
+    private static readonly Protocol _plc_protocol = GetPlcProtocol();
     static async Task Main(string[] args)
     {
         // Load tags from JSON file
@@ -74,7 +75,7 @@ class Program
                 Path = tagDef.Path,
                 Gateway = plc_address,
                 PlcType = _plc_type,
-                Protocol = Protocol.ab_eip
+                Protocol = _plc_protocol
             };
             // tag.Initialize(); // TODO : init tags
             _plcTags.Add(tagDef.Name!, tag);
@@ -230,6 +231,25 @@ class Program
             Environment.Exit(1);
         }
         return plc_type;
+    }
+    private static Protocol GetPlcProtocol()
+    {
+        string? protocol_str = Environment.GetEnvironmentVariable("PLC_PROTOCOL");
+        if (string.IsNullOrEmpty(protocol_str))
+        {
+            Console.WriteLine($"PLC_PROTOCOL environment variable not set; exiting...");
+            Environment.Exit(1);
+        }
+        Dictionary<string, Protocol> protocol_rev = new Dictionary<string, Protocol>{
+            { "ab_eip", Protocol.ab_eip },
+            { "modbus_tcp", Protocol.modbus_tcp }
+        };
+        if (!protocol_rev.TryGetValue(protocol_str, out Protocol protocol))
+        {
+            Console.WriteLine($"Invalid PLC_PROTOCOL ; value : {protocol_str}, but valid values are {string.Join(", ",protocol_rev.Keys)}");
+            Environment.Exit(1);
+        }
+        return protocol;
     }
 }
 
