@@ -16,7 +16,7 @@ class Program
     private static string? plc_address;
     private static string? _rmq_exchange;
     private static string? _rmq_rk;
-
+    private static readonly PlcType _plc_type = GetPlcType();
     static async Task Main(string[] args)
     {
         // Load tags from JSON file
@@ -73,7 +73,7 @@ class Program
                 Name = tagDef.Name,
                 Path = tagDef.Path,
                 Gateway = plc_address,
-                PlcType = PlcType.ControlLogix,
+                PlcType = _plc_type,
                 Protocol = Protocol.ab_eip
             };
             // tag.Initialize(); // TODO : init tags
@@ -205,6 +205,31 @@ class Program
                 Console.WriteLine("RabbitMQ reconnected successfully");
             }
         }
+    }
+
+    private static PlcType GetPlcType()
+    {
+        string? plc_str = Environment.GetEnvironmentVariable("PLC_TYPE");
+        if (string.IsNullOrEmpty(plc_str))
+        {
+            Console.WriteLine($"PLC_TYPE environment variable not set; exiting...");
+            Environment.Exit(1);
+        }
+        Dictionary<string, PlcType> plc_type_rev = new Dictionary<string, PlcType>{
+            { "ControlLogix", PlcType.ControlLogix },
+            { "Plc5", PlcType.Plc5 },
+            { "Slc500", PlcType.Slc500 },
+            { "LogixPccc", PlcType.LogixPccc },
+            { "Micro800", PlcType.Micro800 },
+            { "MicroLogix", PlcType.MicroLogix },
+            { "Omron", PlcType.Omron }
+        };
+        if (!plc_type_rev.TryGetValue(plc_str, out PlcType plc_type))
+        {
+            Console.WriteLine($"Invalid PLC_TYPE ; value : {plc_str}, but valid values are {string.Join(", ",plc_type_rev.Keys)}");
+            Environment.Exit(1);
+        }
+        return plc_type;
     }
 }
 
