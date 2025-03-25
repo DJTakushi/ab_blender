@@ -40,7 +40,7 @@ flowchart TD
 ```
 
 ## 1.2 structure
-:::mermaid
+```mermaid
 ---
 title: Main
 ---
@@ -76,10 +76,9 @@ state rmq_reconnection_setup{
 rmq_reconnection_setup -->  _readTimer.Start()
 
 _readTimer.Start() --> loop
+```
 
-:::
-
-:::mermaid
+```mermaid
 ---
 title: ReadTags
 ---
@@ -97,8 +96,7 @@ state ReadTags {
   state "message printed to console" as console_print
   jsonMessage --> console_print :  rmq disconnected
 }
-:::
-
+```
 
 # 2. use
 
