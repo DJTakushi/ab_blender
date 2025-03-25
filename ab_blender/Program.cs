@@ -112,7 +112,7 @@ class Program
         {
             if (!_stub_plc)
             {
-                _plcTags[tag.Name].Read();
+                _plcTags[tag.Name!].Read();
             }
             Tag this_plc_tag = _plcTags[tag.Name!];
             switch (tag.DataType)
