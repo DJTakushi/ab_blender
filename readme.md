@@ -12,7 +12,7 @@
 
 # 1. functionality
 ## 1.1 functionality
-:::mermaid
+::: mermaid
 flowchart TD
     tags.json>tags.json]
     style tags.json fill:#0000FF,color:#fff
