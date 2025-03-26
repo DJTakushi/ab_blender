@@ -25,7 +25,7 @@ public class AbBlender : BackgroundService
     private IConnection? _outputConnection = null;
     private IChannel? _outputChannel = null;
 
-    private static List<TagDefinition> _tags = [];
+    private static List<TagDefinition> _tagDefs = [];
     private static readonly Dictionary<string, Tag> _plcTags = [];
     private static readonly string _appVersion = "1.0.0";
     private static string? plc_address;
@@ -120,7 +120,7 @@ public class AbBlender : BackgroundService
     private static void LoadTagsFromJson()
     {
         string jsonContent = File.ReadAllText("tags.json");
-        _tags = JsonSerializer.Deserialize<List<TagDefinition>>(jsonContent)
+        _tagDefs = JsonSerializer.Deserialize<List<TagDefinition>>(jsonContent)
             ?? throw new Exception("Failed to load tags from tags.json");
     }
     public static bool HasRabbitMqConfig()
@@ -143,7 +143,7 @@ public class AbBlender : BackgroundService
 
         var timestamp = DateTime.UtcNow;
 
-        foreach (var tag in _tags)
+        foreach (var tag in _tagDefs)
         {
             if (!_stub_plc)
             {
@@ -204,7 +204,7 @@ public class AbBlender : BackgroundService
     }
     private static void InitializePlcTags()
     {
-        foreach (var tagDef in _tags)
+        foreach (var tagDef in _tagDefs)
         {
             var tag = new Tag()
             {
