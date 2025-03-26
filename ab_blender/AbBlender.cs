@@ -77,7 +77,7 @@ public class AbBlender : BackgroundService
 
                 int readPeriodMs = int.Parse(Environment.GetEnvironmentVariable(READ_TAGS_PERIOD_MS) ?? "1000");
                 await Task.Delay(readPeriodMs, stoppingToken);
-            }  
+            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in ExecuteAsync: {ex.Message}");
@@ -152,7 +152,7 @@ public class AbBlender : BackgroundService
             Tag this_plc_tag = _plcTags[tag.Name!];
             switch (tag.DataType)
             {
-                case "bool":
+                case "BOOL":
                     bool b = false;
                     try
                     {
@@ -164,7 +164,19 @@ public class AbBlender : BackgroundService
                     }
                     data["tags"]![tag.Name!] = b;
                     break;
-                case "int32":
+                case "INT":
+                    int i16 = 0;
+                    try
+                    {
+                        i16 = this_plc_tag.GetInt16(0);// TODO : this breaks in my testing
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
+                    }
+                    data["tags"]![tag.Name!] = i16;
+                    break;
+                case "DINT":
                     int i32 = 0;
                     try
                     {
@@ -176,7 +188,7 @@ public class AbBlender : BackgroundService
                     }
                     data["tags"]![tag.Name!] = i32;
                     break;
-                case "float32":
+                case "REAL":
                     double f = 0.0;
                     try
                     {
@@ -187,6 +199,18 @@ public class AbBlender : BackgroundService
                         Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
                     }
                     data["tags"]![tag.Name!] = f;
+                    break;
+                case "STRING":
+                    string str = "";
+                    try
+                    {
+                        str = this_plc_tag.GetString(0);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
+                    }
+                    data["tags"]![tag.Name!] = str;
                     break;
                 default:
                     Console.WriteLine($"Unknown type : {tag.DataType}");
@@ -229,7 +253,7 @@ public class AbBlender : BackgroundService
             {
                 tag.Initialize();
             }
-            if(_plcTags.ContainsKey(tagDef.Name!))
+            if (_plcTags.ContainsKey(tagDef.Name!))
             {
                 Console.WriteLine($"Duplicate tag name found: {tagDef.Name}; skipping");
             }
