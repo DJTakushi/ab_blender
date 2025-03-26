@@ -220,7 +220,7 @@ public class AbBlender : BackgroundService
             var tag = new Tag()
             {
                 Name = tagDef.Name,
-                Path = tagDef.Path,
+                Path = tagDef.Path, // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
                 Gateway = plc_address,
                 PlcType = _plc_type,
                 Protocol = _plc_protocol
