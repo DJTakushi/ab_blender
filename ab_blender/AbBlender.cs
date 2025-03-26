@@ -22,9 +22,9 @@ public class AbBlender : BackgroundService
     private const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
 
     private readonly IRabbitMQConnectionManager _connectionManager;
-    private ConnectionFactory _outputFactory = null;
-    private IConnection _outputConnection = null;
-    private IChannel _outputChannel = null;
+    private ConnectionFactory? _outputFactory = null;
+    private IConnection? _outputConnection = null;
+    private IChannel? _outputChannel = null;
 
     private static List<TagDefinition> _tags = [];
     private static readonly Dictionary<string, Tag> _plcTags = [];
