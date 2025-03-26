@@ -229,7 +229,15 @@ public class AbBlender : BackgroundService
             {
                 tag.Initialize();
             }
-            _plcTags.Add(tagDef.Name!, tag);
+            if(_plcTags.ContainsKey(tagDef.Name!))
+            {
+                Console.WriteLine($"Duplicate tag name found: {tagDef.Name}; skipping");
+            }
+            else
+            {
+                Console.WriteLine($"Tag {tagDef.Name} initialized");
+                _plcTags.Add(tagDef.Name!, tag);
+            }
         }
     }
     private static bool GetPlcStub()
