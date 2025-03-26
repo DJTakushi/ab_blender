@@ -150,72 +150,35 @@ public class AbBlender : BackgroundService
                 _plcTags[tag.Name!].Read();
             }
             Tag this_plc_tag = _plcTags[tag.Name!];
-            switch (tag.DataType)
+            try
             {
-                case "BOOL":
-                    bool b = false;
-                    try
-                    {
-                        b = this_plc_tag.GetBit(0); // TODO : this breaks in my testing
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
-                    }
-                    data["tags"]![tag.Name!] = b;
-                    break;
-                case "INT":
-                    int i16 = 0;
-                    try
-                    {
-                        i16 = this_plc_tag.GetInt16(0);// TODO : this breaks in my testing
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
-                    }
-                    data["tags"]![tag.Name!] = i16;
-                    break;
-                case "DINT":
-                    int i32 = 0;
-                    try
-                    {
-                        i32 = this_plc_tag.GetInt32(0);// TODO : this breaks in my testing
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
-                    }
-                    data["tags"]![tag.Name!] = i32;
-                    break;
-                case "REAL":
-                    double f = 0.0;
-                    try
-                    {
-                        f = this_plc_tag.GetFloat32(0);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
-                    }
-                    data["tags"]![tag.Name!] = f;
-                    break;
-                case "STRING":
-                    string str = "";
-                    try
-                    {
-                        str = this_plc_tag.GetString(0);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
-                    }
-                    data["tags"]![tag.Name!] = str;
-                    break;
-                default:
-                    Console.WriteLine($"Unknown type : {tag.DataType}");
-                    break;
+                switch (tag.DataType)
+                {
+                    case "BOOL":
+                        data["tags"]![tag.Name!] = this_plc_tag.GetBit(0); // TODO : this breaks in my testing
+                        break;
+                    case "INT":
+                        data["tags"]![tag.Name!] = this_plc_tag.GetInt16(0);// TODO : this breaks in my testing
+                        break;
+                    case "DINT":
+                        data["tags"]![tag.Name!] = this_plc_tag.GetInt32(0);// TODO : this breaks in my testing
+                        break;
+                    case "REAL":
+                        data["tags"]![tag.Name!] = this_plc_tag.GetFloat32(0);
+                        break;
+                    case "STRING":
+                        data["tags"]![tag.Name!] = this_plc_tag.GetString(0);
+                        break;
+                    default:
+                        Console.WriteLine($"Unknown type : {tag.DataType}");
+                        break;
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
+            }
+
         }
 
         string jsonMessage = data.ToJsonString();
