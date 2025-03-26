@@ -3,6 +3,8 @@ using System.Text.Json.Nodes;
 using System.Reflection.Metadata;
 using libplctag;
 using RabbitMQ.Client;
+using RmqConnection;
+
 
 public class AbBlender : BackgroundService
 {
@@ -19,11 +21,13 @@ public class AbBlender : BackgroundService
     private const string RABBITMQ_RECONNECTION_PERIOD_MS = "RABBITMQ_RECONNECTION_PERIOD_MS";
     private const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
 
+    private readonly IRabbitMQConnectionManager _connectionManager;
+    private ConnectionFactory _outputFactory = null;
+    private IConnection _outputConnection = null;
+    private IChannel _outputChannel = null;
+
     private static List<TagDefinition> _tags = [];
     private static readonly Dictionary<string, Tag> _plcTags = [];
-    private static IConnection? _rabbitConnection;
-    private static IChannel? _rabbitChannel;
-    private static System.Timers.Timer? _readTimer;
     private static System.Timers.Timer? _reconnectTimer;
     private static readonly string _appVersion = "1.0.0";
     private static string? plc_address;
@@ -33,17 +37,13 @@ public class AbBlender : BackgroundService
     private static readonly Protocol _plc_protocol = GetPlcProtocol();
     private static readonly bool _stub_plc = GetPlcStub();
     private int readPeriodMs = 1000;
-    private const int SEMAPHOR_COUNT = 1;// Limit to 1 concurrent executions
-    private readonly SemaphoreSlim _semaphore;
 
-    public AbBlender()
+    public AbBlender(IRabbitMQConnectionManager connectionManager)
     {
-        _semaphore = new SemaphoreSlim(SEMAPHOR_COUNT);
-        Console.WriteLine("AbBlender constructor");
-        // Load tags from JSON file
+        _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
+
         LoadTagsFromJson();
 
-        // Initialize PLC tags
         InitializePlcTags();
 
         plc_address = Environment.GetEnvironmentVariable(PLC_IP)!;
@@ -54,28 +54,16 @@ public class AbBlender : BackgroundService
         }
         Console.WriteLine($"plc_address : {plc_address}");
 
-        // Setup tag reading timer
-        // readPeriodMs = int.Parse(Environment.GetEnvironmentVariable(READ_TAGS_PERIOD_MS) ?? "1000");
-        // _readTimer = new System.Timers.Timer(readPeriodMs);
-        // _readTimer.Elapsed += async (s, e) => await ReadTags();
-        // _readTimer.AutoReset = true;
-
-        // // Setup RabbitMQ if environment variables are present
-        // if (HasRabbitMqConfig())
-        // {
-        //     await SetupRabbitMq();
-        //     double reconnectPeriodMs = double.Parse(Environment.GetEnvironmentVariable(RABBITMQ_RECONNECTION_PERIOD_MS) ?? "5000");
-        //     _reconnectTimer = new System.Timers.Timer(reconnectPeriodMs);
-        //     _reconnectTimer.Elapsed += async (s, e) => await ReconnectRabbitMq();
-        //     _reconnectTimer.AutoReset = true;
-        // }
-
-        // Start reading tags
-        // _readTimer.Start();
-        // Console.WriteLine("Started reading tags...");
-
-        // Keep application running
-        // await Task.Delay(-1);
+        // Setup RabbitMQ if environment variables are present
+        if (HasRabbitMqConfig())
+        {
+            _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)!;
+            _rmq_rk = Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY);
+        }
+        else
+        {
+            Console.WriteLine("RabbitMQ configuration not found; skipping RabbitMQ setup.");
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -84,21 +72,48 @@ public class AbBlender : BackgroundService
         {
             try
             {
-                // await _semaphore.WaitAsync();
-                // if (HasRabbitMqConfig())
-                // {
-                //     // SetupConnectionsAsync();
-                // }
-                // await ProcessMessagesAsync(stoppingToken);
+                if (HasRabbitMqConfig())
+                {
+                    SetupConnectionsAsync();
+                }
                 await ReadTags();  // TODO : break into separate components
                 await Task.Delay(readPeriodMs, stoppingToken);
             }
             catch (Exception ex)
             {
-                // _logger.LogError(ex, "Error in RabbitMQ service");
-                // CleanupConnectionsAsync();
-                // await Task.Delay(reconnect_delay, stoppingToken);
+                Console.WriteLine($"Error in ExecuteAsync: {ex.Message}");
             }
+        }
+    }
+
+    internal virtual async void SetupConnectionsAsync()
+    {
+        try
+        {
+            if (_outputConnection?.IsOpen != true)
+            {
+                if(_outputConnection != null){
+                    await _outputConnection.CloseAsync();
+                    await _outputConnection.DisposeAsync();
+                }
+                _outputConnection =  null;
+
+                _outputFactory = _connectionManager.CreateFactory(""); // TODO : use "OUTPUT_"
+                _outputConnection = await _connectionManager.CreateConnection(_outputFactory,"ab_blender_output");
+                _outputChannel = await _outputConnection.CreateChannelAsync();
+
+                _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)!;
+                await _outputChannel.ExchangeDeclareAsync(_rmq_exchange, "topic");
+
+                Console.WriteLine($"{_rmq_exchange} exchange created; rmq connection established.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in SetupConnectionsAsync: {ex.Message}");
+            _outputFactory = null;
+            _outputConnection = null;
+            _outputChannel = null;
         }
     }
 
@@ -108,7 +123,7 @@ public class AbBlender : BackgroundService
         _tags = JsonSerializer.Deserialize<List<TagDefinition>>(jsonContent)
             ?? throw new Exception("Failed to load tags from tags.json");
     }
-    private static bool HasRabbitMqConfig()
+    public static bool HasRabbitMqConfig()
     {
         return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_HOST)) &&
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_USER)) &&
@@ -117,52 +132,7 @@ public class AbBlender : BackgroundService
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY)) &&
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_CONNECTION_NAME));
     }
-    // private static async Task SetupRabbitMq()
-    // {
-    //     try
-    //     {
-    //         var factory = new ConnectionFactory
-    //         {
-    //             HostName = Environment.GetEnvironmentVariable(RABBITMQ_HOST)!,
-    //             UserName = Environment.GetEnvironmentVariable(RABBITMQ_USER)!,
-    //             Password = Environment.GetEnvironmentVariable(RABBITMQ_PASS)!,
-    //             AutomaticRecoveryEnabled = true
-    //         };
-
-    //         _rabbitConnection = await factory.CreateConnectionAsync();
-    //         _rabbitChannel = await _rabbitConnection.CreateChannelAsync();
-    //         _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)!;
-    //         await _rabbitChannel.ExchangeDeclareAsync(_rmq_exchange, "topic");
-    //         _rmq_rk = Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY);
-
-    //         Console.WriteLine("Connected to RabbitMQ");
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine($"RabbitMQ connection failed: {ex.Message}");
-    //         _reconnectTimer?.Start();
-    //     }
-    // }
-
-    // private static async Task ReconnectRabbitMq()
-    // {
-    //     if (_rabbitChannel?.IsOpen != true)
-    //     {
-    //         Console.WriteLine("Attempting to reconnect to RabbitMQ...");
-    //         if (_rabbitConnection != null)
-    //         {
-    //             await _rabbitConnection.CloseAsync();
-    //             await _rabbitConnection.DisposeAsync();
-    //         }
-    //         // await SetupRabbitMq();
-    //         if (_rabbitChannel?.IsOpen == true)
-    //         {
-    //             _reconnectTimer?.Stop();
-    //             Console.WriteLine("RabbitMQ reconnected successfully");
-    //         }
-    //     }
-    // }
-    private static async Task ReadTags()
+    private async Task ReadTags()
     {
         JsonNode data = new JsonObject
         {
@@ -227,11 +197,11 @@ public class AbBlender : BackgroundService
         string jsonMessage = data.ToJsonString();
 
         // Publish to RabbitMQ if configured
-        if (_rabbitChannel?.IsOpen == true)
+        if (_outputChannel?.IsOpen == true)
         {
             var body = System.Text.Encoding.UTF8.GetBytes(jsonMessage);
             var props = new BasicProperties();
-            await _rabbitChannel.BasicPublishAsync(
+            await _outputChannel.BasicPublishAsync(
                 exchange: _rmq_exchange!,
                         routingKey: _rmq_rk!,
                         mandatory: false,
