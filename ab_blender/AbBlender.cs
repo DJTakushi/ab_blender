@@ -169,6 +169,8 @@ public class AbBlender : BackgroundService
                     case "STRING":
                         data["tags"]![tag.Name!] = this_plc_tag.GetString(0);
                         break;
+                    case "":  //blank DataTypes exist
+                        break;
                     default:
                         Console.WriteLine($"Unknown type : {tag.DataType}");
                         break;
