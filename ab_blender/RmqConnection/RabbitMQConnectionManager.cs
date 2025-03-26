@@ -5,24 +5,16 @@ namespace RmqConnection
 {
     public class RabbitMQConnectionManager : IRabbitMQConnectionManager
     {
-        private readonly ConnectionFactory _inputFactory;
-        private readonly ConnectionFactory _outputFactory;
-
-        public RabbitMQConnectionManager()
+        public ConnectionFactory CreateFactory(string prefix)
         {
-            _inputFactory = CreateFactory("INPUT");
-            _outputFactory = CreateFactory("OUTPUT");
-        }
+            var host = Environment.GetEnvironmentVariable($"{prefix}RABBITMQ_HOST");
+            var user = Environment.GetEnvironmentVariable($"{prefix}RABBITMQ_USER");
+            var pass = Environment.GetEnvironmentVariable($"{prefix}RABBITMQ_PASS");
+            var name = Environment.GetEnvironmentVariable($"{prefix}RABBITMQ_CONNECTION_NAME");
 
-        private ConnectionFactory CreateFactory(string prefix)
-        {
-            var host = Environment.GetEnvironmentVariable($"{prefix}_RABBITMQ_HOST");
-            var user = Environment.GetEnvironmentVariable($"{prefix}_RABBITMQ_USER");
-            var pass = Environment.GetEnvironmentVariable($"{prefix}_RABBITMQ_PASS");
-
-            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass))
+            if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass) || string.IsNullOrEmpty(name))
             {
-                Console.WriteLine($"Error: Missing required environment variables for {prefix}_RABBITMQ (HOST, USER, or PASS)");
+                Console.WriteLine($"Error: Missing required environment variables for {prefix}RABBITMQ (HOST, USER, PASS, CONNECTION_NAME)");
                 Environment.Exit(1);
             }
 
@@ -35,9 +27,6 @@ namespace RmqConnection
             };
         }
 
-        public async Task<IConnection> CreateInputConnection() => await _inputFactory.CreateConnectionAsync();
-        public async Task<IConnection> CreateOutputConnection() => await _outputFactory.CreateConnectionAsync();
-        public string InputHost => _inputFactory.HostName;
-        public string OutputHost => _outputFactory.HostName;
+        public async Task<IConnection> CreateConnection(ConnectionFactory factory, string name) => await factory.CreateConnectionAsync(name);
     }
 }
