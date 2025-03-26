@@ -35,7 +35,6 @@ public class AbBlender : BackgroundService
     private static readonly PlcType _plc_type = GetPlcType();
     private static readonly Protocol _plc_protocol = GetPlcProtocol();
     private static readonly bool _stub_plc = GetPlcStub();
-    private int readPeriodMs = 1000;
 
     public AbBlender(IRabbitMQConnectionManager connectionManager)
     {
@@ -76,8 +75,10 @@ public class AbBlender : BackgroundService
                     SetupConnectionsAsync();
                 }
                 await ReadTags();  // TODO : break into separate components
+
+                int readPeriodMs = int.Parse(Environment.GetEnvironmentVariable(READ_TAGS_PERIOD_MS) ?? "1000");
                 await Task.Delay(readPeriodMs, stoppingToken);
-            }
+            }  
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in ExecuteAsync: {ex.Message}");
@@ -91,14 +92,15 @@ public class AbBlender : BackgroundService
         {
             if (_outputConnection?.IsOpen != true)
             {
-                if(_outputConnection != null){
+                if (_outputConnection != null)
+                {
                     await _outputConnection.CloseAsync();
                     await _outputConnection.DisposeAsync();
                 }
-                _outputConnection =  null;
+                _outputConnection = null;
 
                 _outputFactory = _connectionManager.CreateFactory(""); // TODO : use "OUTPUT_"
-                _outputConnection = await _connectionManager.CreateConnection(_outputFactory,"ab_blender_output");
+                _outputConnection = await _connectionManager.CreateConnection(_outputFactory, "ab_blender_output");
                 _outputChannel = await _outputConnection.CreateChannelAsync();
 
                 _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)!;
