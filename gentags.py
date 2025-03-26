@@ -20,7 +20,7 @@ def csv_to_json(input_csv_file, output_json_file):
                         "app_name": row[0],
                         "Name": row[1],
                         "DataType": row[2],
-                        "Path": ""
+                        "Path": "1,0"
                     }
                     result.append(entry)
                 
