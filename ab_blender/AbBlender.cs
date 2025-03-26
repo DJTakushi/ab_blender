@@ -28,7 +28,6 @@ public class AbBlender : BackgroundService
 
     private static List<TagDefinition> _tags = [];
     private static readonly Dictionary<string, Tag> _plcTags = [];
-    private static System.Timers.Timer? _reconnectTimer;
     private static readonly string _appVersion = "1.0.0";
     private static string? plc_address;
     private static string? _rmq_exchange;
