@@ -18,7 +18,6 @@ public class AbBlender : BackgroundService
     private const string RABBITMQ_PASS = "RABBITMQ_PASS";
     private const string RABBITMQ_EXCHANGE = "RABBITMQ_EXCHANGE";
     private const string RABBITMQ_ROUTING_KEY = "RABBITMQ_ROUTING_KEY";
-    private const string RABBITMQ_RECONNECTION_PERIOD_MS = "RABBITMQ_RECONNECTION_PERIOD_MS";
     private const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
 
     private readonly IRabbitMQConnectionManager _connectionManager;
