@@ -43,7 +43,7 @@ public class AbBlender : BackgroundService
     private static readonly PlcType _plc_type = GetPlcType();
     private static readonly Protocol _plc_protocol = GetPlcProtocol();
     private static readonly bool _stub_plc = GetPlcStub();
-    private string _output = "";
+    private readonly Queue<string> _outputs = [];
 
     public AbBlender(IRabbitMQConnectionManager connectionManager)
     {
@@ -66,8 +66,14 @@ public class AbBlender : BackgroundService
         {
             try
             {
-
-                await ReadTags();
+                if (attributes.Count > 0)
+                {
+                    await ReadTags();
+                }
+                else
+                { // no tags registered; identify with mapper
+                    identifyPlcTagsWithMapper();
+                }
                 if (HasRabbitMqConfig())
                 {
                     SetupConnectionsAsync();
@@ -75,8 +81,13 @@ public class AbBlender : BackgroundService
                 }
                 else
                 {
-                    Console.WriteLine($"{_output}");
+
+                    while(_outputs.Count > 0)
+                    {
+                        Console.WriteLine($"{_outputs.Dequeue()}");
+                    }
                 }
+                _outputs.Clear();
 
                 int readPeriodMs = int.Parse(Environment.GetEnvironmentVariable(READ_TAGS_PERIOD_MS) ?? "1000");
                 await Task.Delay(readPeriodMs, stoppingToken);
@@ -234,10 +245,8 @@ public class AbBlender : BackgroundService
             {
                 Console.WriteLine($"Error in ReadTags for tag '{attr.TagInfo.Name}', type '{attr.TagInfo.Type}' : {ex.Message}");
             }
-
         }
-
-        string _output = data.ToJsonString();
+        _outputs.Enqueue(data.ToJsonString());
     }
     private async Task publishOutputToRabbitMQ()
     {
@@ -246,14 +255,17 @@ public class AbBlender : BackgroundService
 
         if (_outputChannel?.IsOpen == true)
         {
-            var body = System.Text.Encoding.UTF8.GetBytes(_output);
-            var props = new BasicProperties();
-            await _outputChannel.BasicPublishAsync(
-                exchange: _rmq_exchange!,
-                        routingKey: _rmq_rk!,
-                        mandatory: false,
-                        basicProperties: props,
-                        body: body);
+            while(_outputs.Count > 0)
+            {
+                var body = System.Text.Encoding.UTF8.GetBytes(_outputs.Dequeue());
+                var props = new BasicProperties();
+                await _outputChannel.BasicPublishAsync(
+                    exchange: _rmq_exchange!,
+                            routingKey: _rmq_rk!,
+                            mandatory: false,
+                            basicProperties: props,
+                            body: body);
+            }
         }
     }
 
@@ -269,7 +281,7 @@ public class AbBlender : BackgroundService
         };
 
         tags.Read();
-        Console.WriteLine($"{tags.Value}");
+        _outputs.Enqueue($"{tags.Value}");
         foreach (var tag in tags.Value)
         {
             var myTag = new Tag()
@@ -280,7 +292,7 @@ public class AbBlender : BackgroundService
                 PlcType = _plc_type,
                 Protocol = _plc_protocol
             };
-            Console.WriteLine($"tag: {tag.Name} ; value: {myTag.GetFloat32(0)}");
+            _outputs.Enqueue($"tag: {tag.Name} ; value: {myTag.GetFloat32(0)}");
         }
     }
     private static bool GetPlcStub()
