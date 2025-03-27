@@ -252,34 +252,32 @@ public class AbBlender : BackgroundService
         }
     }
 
-    // private void getPlcTagsFromMapper()
-    // {  // TODO : create an enum for types that matches mapper.
-    //     var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE?!?
-    //     {
-    //         Gateway = plc_address,
-    //         Path = "1,0",  // TODO ; un-hardcode this
-    //         PlcType = PlcType.ControlLogix,
-    //         Protocol = Protocol.ab_eip,
-    //         Name = "@tags"
-    //     };
+    private void identifyPlcTagsWithMapper()
+    { // NOTE : https://github.com/libplctag/libplctag.NET/issues/406
+        var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE
+        {
+            Gateway = plc_address,
+            Path = "1,0",  // TODO ; un-hardcode this
+            PlcType = _plc_type,
+            Protocol = _plc_protocol,
+            Name = "@tags"
+        };
 
-    //     tags.Read();
-    //     Console.WriteLine($"{tags.Value}");
-    //     foreach (var tag in tags.Value)
-    //     {
-
-    //         //     ExampleRW.Run( tag.Name, PlcType.Micro800 , Protocol.ab_eip);
-    //         var myTag = new Tag()
-    //         {
-    //             Name = $"{tag.Name}",
-    //             Gateway = "172.16.31.2",
-    //             Path = "1,0",
-    //             PlcType = PlcType.ControlLogix,
-    //             Protocol = Protocol.ab_eip
-    //         };
-    //         Console.WriteLine($"tag: {tag.Name} Time: {DateTime.Now} value: {myTag.GetFloat32(0)}");
-    //     }
-    // }
+        tags.Read();
+        Console.WriteLine($"{tags.Value}");
+        foreach (var tag in tags.Value)
+        {
+            var myTag = new Tag()
+            {
+                Name = $"{tag.Name}",
+                Path = "1,0", // assuming default
+                Gateway = plc_address,
+                PlcType = _plc_type,
+                Protocol = _plc_protocol
+            };
+            Console.WriteLine($"tag: {tag.Name} ; value: {myTag.GetFloat32(0)}");
+        }
+    }
     private static bool GetPlcStub()
     {
         string? stub_plc_s = Environment.GetEnvironmentVariable(STUB_PLC);
