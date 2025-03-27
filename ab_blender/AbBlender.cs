@@ -69,7 +69,7 @@ public class AbBlender : BackgroundService
             {
                 if (attributes.Count > 0)
                 {
-                    await ReadTags();
+                    ReadFromMyTags();
                 }
                 else
                 { // no tags registered; identify with mapper
@@ -207,7 +207,7 @@ public class AbBlender : BackgroundService
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY)) &&
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_CONNECTION_NAME));
     }
-    private async Task ReadTags()  // TODO: rename this to something more accurate
+    private void ReadFromMyTags()
     {
         JsonNode data = new JsonObject
         {
