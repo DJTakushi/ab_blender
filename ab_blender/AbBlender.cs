@@ -14,7 +14,11 @@ public enum tagType
     REAL = 202,
     STRING
 }
-
+class tag_attribute
+{
+    public Tag tag { get; set; }
+    public TagInfo tag_info { get; set; }
+}
 public class AbBlender : BackgroundService
 {
     private const string PLC_IP = "PLC_IP";
@@ -33,9 +37,7 @@ public class AbBlender : BackgroundService
     private ConnectionFactory? _outputFactory = null;
     private IConnection? _outputConnection = null;
     private IChannel? _outputChannel = null;
-
-    private static List<TagInfo> _tagDefs = [];
-    private static readonly Dictionary<string, Tag> _plcTags = [];
+    private static List<tag_attribute> attributes = [];
     private static readonly string _appVersion = "1.0.0";
     private static string? plc_address;
     private static string? _rmq_exchange;
@@ -50,7 +52,7 @@ public class AbBlender : BackgroundService
 
         LoadTagsFromJson();
 
-        InitializePlcTags();
+        // InitializePlcTags();
 
         plc_address = Environment.GetEnvironmentVariable(PLC_IP)!;
         if (string.IsNullOrEmpty(plc_address))
@@ -158,11 +160,26 @@ public class AbBlender : BackgroundService
                     break;
             }
 
-            _tagDefs.Add(new TagInfo
+            attributes.Add(new tag_attribute
             {
-                Name = data["Name"].ToString(),
-                Type = type_t
+                tag = new Tag
+                {
+                    Name = data["Name"].ToString(),
+                    Path = data["Path"].ToString(), // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
+                    Gateway = plc_address,
+                    PlcType = _plc_type,
+                    Protocol = _plc_protocol
+                },
+                tag_info = new TagInfo
+                {
+                    Name = data["Name"].ToString(),
+                    Type = type_t
+                }
             });
+            if (!_stub_plc)
+            {
+                attributes.Last().tag.Initialize();
+            }
         }
     }
     public static bool HasRabbitMqConfig()
@@ -185,40 +202,42 @@ public class AbBlender : BackgroundService
 
         var timestamp = DateTime.UtcNow;
 
-        foreach (var tag in _tagDefs)
+        foreach (var attr in attributes)
         {
             if (!_stub_plc)
             {
-                _plcTags[tag.Name!].Read();
+                attr.tag.Read();
             }
-            Tag this_plc_tag = _plcTags[tag.Name!];
             try
             {
-                switch (tag.Type)  // TODO ; reaplce this wiht deprecated numeric type (TagInfo.Type)
+                switch (attr.tag_info.Type)  // TODO ; reaplce this wiht deprecated numeric type (TagInfo.Type)
                 {
                     case (ushort)tagType.BOOL:
-                        // data["tags"]![tag.Name!] = this_plc_tag.GetBit(0); // TODO : this breaks in my testing
+                        break; // TODO : this breaks in my testing
+                        data["tags"]![attr.tag_info.Name] = attr.tag.GetBit(0);
                         break;
                     case (ushort)tagType.INT:
-                        // data["tags"]![tag.Name!] = this_plc_tag.GetInt16(0);// TODO : this breaks in my testing
+                        break; // TODO : this breaks in my testing
+                        data["tags"]![attr.tag_info.Name] = attr.tag.GetInt16(0);
                         break;
                     case (ushort)tagType.DINT:
-                        // data["tags"]![tag.Name!] = this_plc_tag.GetInt32(0);// TODO : this breaks in my testing
+                        break; // TODO : this breaks in my testing
+                        data["tags"]![attr.tag_info.Name] = attr.tag.GetInt32(0);
                         break;
                     case (ushort)tagType.REAL:
-                        data["tags"]![tag.Name!] = this_plc_tag.GetFloat32(0);
+                        data["tags"]![attr.tag_info.Name] = attr.tag.GetFloat32(0);
                         break;
                     case (ushort)tagType.STRING:
-                        data["tags"]![tag.Name!] = this_plc_tag.GetString(0);
+                        data["tags"]![attr.tag_info.Name] = attr.tag.GetString(0);
                         break;
                     default:
-                        Console.WriteLine($"Unknown type : {tag.Type}");
+                        Console.WriteLine($"Unknown type : {attr.tag_info.Type}");
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.Type}' : {ex.Message}");
+                Console.WriteLine($"Error in ReadTags for tag '{attr.tag_info.Name}', type '{attr.tag_info.Type}' : {ex.Message}");
             }
 
         }
@@ -271,33 +290,6 @@ public class AbBlender : BackgroundService
     //         Console.WriteLine($"tag: {tag.Name} Time: {DateTime.Now} value: {myTag.GetFloat32(0)}");
     //     }
     // }
-    private static void InitializePlcTags()
-    { // TODO  : integrate this with LoadTagsFromJson
-        foreach (var tagDef in _tagDefs)
-        {
-            var tag = new Tag()
-            {
-                Name = tagDef.Name,
-                Path = "1,0",//tagDef.Path, // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
-                Gateway = plc_address,
-                PlcType = _plc_type,
-                Protocol = _plc_protocol
-            };
-            if (!_stub_plc)
-            {
-                tag.Initialize();
-            }
-            if (_plcTags.ContainsKey(tagDef.Name!))
-            {
-                Console.WriteLine($"Duplicate tag name found: {tagDef.Name}; skipping");
-            }
-            else
-            {
-                Console.WriteLine($"Tag {tagDef.Name} initialized");
-                _plcTags.Add(tagDef.Name!, tag);
-            }
-        }
-    }
     private static bool GetPlcStub()
     {
         string? stub_plc_s = Environment.GetEnvironmentVariable(STUB_PLC);
