@@ -141,7 +141,7 @@ public class AbBlender : BackgroundService
             return;
         }
         string jsonContent = File.ReadAllText(tag_def_fp);
-        var jsonObj = JsonObject.Parse(jsonContent);
+        var jsonObj = JsonNode.Parse(jsonContent);
         foreach (var data in jsonObj!.AsArray())
         {
             try
