@@ -16,8 +16,8 @@ public enum tagType
 }
 class tag_attribute
 {
-    public Tag tag { get; set; }
-    public TagInfo tag_info { get; set; }
+    public required Tag Tag { get; set; }
+    public required TagInfo TagInfo { get; set; }
 }
 public class AbBlender : BackgroundService
 {
@@ -162,7 +162,7 @@ public class AbBlender : BackgroundService
 
             attributes.Add(new tag_attribute
             {
-                tag = new Tag
+                Tag = new Tag
                 {
                     Name = data["Name"].ToString(),
                     Path = data["Path"].ToString(), // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
@@ -170,7 +170,7 @@ public class AbBlender : BackgroundService
                     PlcType = _plc_type,
                     Protocol = _plc_protocol
                 },
-                tag_info = new TagInfo
+                TagInfo = new TagInfo
                 {
                     Name = data["Name"].ToString(),
                     Type = type_t
@@ -178,7 +178,7 @@ public class AbBlender : BackgroundService
             });
             if (!_stub_plc)
             {
-                attributes.Last().tag.Initialize();
+                attributes.Last().Tag.Initialize();
             }
         }
     }
@@ -206,38 +206,39 @@ public class AbBlender : BackgroundService
         {
             if (!_stub_plc)
             {
-                attr.tag.Read();
+                attr.Tag.Read();
             }
             try
             {
-                switch (attr.tag_info.Type)  // TODO ; reaplce this wiht deprecated numeric type (TagInfo.Type)
+                switch (attr.TagInfo.Type)  // TODO ; reaplce this wiht deprecated numeric type (TagInfo.Type)
                 {
                     case (ushort)tagType.BOOL:
                         break; // TODO : this breaks in my testing
-                        data["tags"]![attr.tag_info.Name] = attr.tag.GetBit(0);
+                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
                         break;
                     case (ushort)tagType.INT:
                         break; // TODO : this breaks in my testing
-                        data["tags"]![attr.tag_info.Name] = attr.tag.GetInt16(0);
+                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
                         break;
                     case (ushort)tagType.DINT:
                         break; // TODO : this breaks in my testing
-                        data["tags"]![attr.tag_info.Name] = attr.tag.GetInt32(0);
+                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
                         break;
                     case (ushort)tagType.REAL:
-                        data["tags"]![attr.tag_info.Name] = attr.tag.GetFloat32(0);
+                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetFloat32(0);
                         break;
                     case (ushort)tagType.STRING:
-                        data["tags"]![attr.tag_info.Name] = attr.tag.GetString(0);
+                        break; // TODO : this breaks in my testing
+                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetString(0);
                         break;
                     default:
-                        Console.WriteLine($"Unknown type : {attr.tag_info.Type}");
+                        Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in ReadTags for tag '{attr.tag_info.Name}', type '{attr.tag_info.Type}' : {ex.Message}");
+                Console.WriteLine($"Error in ReadTags for tag '{attr.TagInfo.Name}', type '{attr.TagInfo.Type}' : {ex.Message}");
             }
 
         }
