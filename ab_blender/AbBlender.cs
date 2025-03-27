@@ -4,7 +4,7 @@ using libplctag.DataTypes;
 using RabbitMQ.Client;
 using RmqConnection;
 
-public enum tagType
+public enum tagType // TODO : investigate these values
 {
     BOOL,
     INT,
@@ -207,7 +207,7 @@ public class AbBlender : BackgroundService
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY)) &&
                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(RABBITMQ_CONNECTION_NAME));
     }
-    private async Task ReadTags()
+    private async Task ReadTags()  // TODO: rename this to something more accurate
     {
         JsonNode data = new JsonObject
         {
@@ -289,20 +289,51 @@ public class AbBlender : BackgroundService
                 Name = "@tags"
             };
 
-            tags.Read();
-            _outputs.Enqueue($"{tags.Value}");
-            foreach (var tag in tags.Value)
+            JsonNode data = new JsonObject
             {
-                var myTag = new Tag()
+                ["timestamp"] = DateTime.UtcNow.ToString("O"),
+                ["app_version"] = _appVersion,
+                ["tags"] = new JsonObject()
+            };
+
+            if (!_stub_plc)
+            {
+                tags.Read();
+                _outputs.Enqueue($"{tags.Value}");
+                foreach (var tag in tags.Value)
                 {
-                    Name = $"{tag.Name}",
-                    Path = "1,0", // assuming default
-                    Gateway = plc_address,
-                    PlcType = _plc_type,
-                    Protocol = _plc_protocol
-                };
-                _outputs.Enqueue($"tag: {tag.Name} ; value: {myTag.GetFloat32(0)}");
+                    var myTag = new Tag()
+                    {
+                        Name = $"{tag.Name}",
+                        Path = "1,0", // assuming default
+                        Gateway = plc_address,
+                        PlcType = _plc_type,
+                        Protocol = _plc_protocol
+                    };
+                    switch (tag.Type)
+                    {
+                        case (ushort)tagType.REAL:
+                            data["tags"]![myTag.Name] = myTag.GetFloat32(0);
+                            break;
+                        case (ushort)tagType.BOOL:
+                            data["tags"]![myTag.Name] = myTag.GetBit(0);
+                            break;
+                        case (ushort)tagType.INT:
+                            data["tags"]![myTag.Name] = myTag.GetInt16(0);
+                            break;
+                        case (ushort)tagType.DINT:
+                            data["tags"]![myTag.Name] = myTag.GetInt32(0);
+                            break;
+                        case (ushort)tagType.STRING:
+                            data["tags"]![myTag.Name] = myTag.GetString(0);
+                            break;
+                        default:
+                            Console.WriteLine($"Unknown type : {tag.Type}");
+                            break;
+                    }
+                }
             }
+            _outputs.Enqueue(data.ToJsonString());
         }
         catch (Exception ex)
         {
