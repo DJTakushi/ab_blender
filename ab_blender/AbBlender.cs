@@ -278,28 +278,35 @@ public class AbBlender : BackgroundService
 
     private void identifyPlcTagsWithMapper()
     { // NOTE : https://github.com/libplctag/libplctag.NET/issues/406
-        var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE
+        try
         {
-            Gateway = plc_address,
-            Path = "1,0",  // TODO ; un-hardcode this
-            PlcType = _plc_type,
-            Protocol = _plc_protocol,
-            Name = "@tags"
-        };
-
-        tags.Read();
-        _outputs.Enqueue($"{tags.Value}");
-        foreach (var tag in tags.Value)
-        {
-            var myTag = new Tag()
+            var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE
             {
-                Name = $"{tag.Name}",
-                Path = "1,0", // assuming default
                 Gateway = plc_address,
+                Path = "1,0",  // TODO ; un-hardcode this
                 PlcType = _plc_type,
-                Protocol = _plc_protocol
+                Protocol = _plc_protocol,
+                Name = "@tags"
             };
-            _outputs.Enqueue($"tag: {tag.Name} ; value: {myTag.GetFloat32(0)}");
+
+            tags.Read();
+            _outputs.Enqueue($"{tags.Value}");
+            foreach (var tag in tags.Value)
+            {
+                var myTag = new Tag()
+                {
+                    Name = $"{tag.Name}",
+                    Path = "1,0", // assuming default
+                    Gateway = plc_address,
+                    PlcType = _plc_type,
+                    Protocol = _plc_protocol
+                };
+                _outputs.Enqueue($"tag: {tag.Name} ; value: {myTag.GetFloat32(0)}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in identifyPlcTagsWithMapper: {ex.Message}");
         }
     }
     private static bool GetPlcStub()
