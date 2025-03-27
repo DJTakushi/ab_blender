@@ -137,48 +137,57 @@ public class AbBlender : BackgroundService
         var jsonObj = JsonObject.Parse(jsonContent);
         foreach (var data in jsonObj.AsArray())
         {
-            ushort type_t = 0;
-            switch (data["DataType"].ToString())
+            try
             {
-                case "BOOL":
-                    type_t = (ushort)tagType.BOOL;
-                    break;
-                case "INT":
-                    type_t = (ushort)tagType.INT;
-                    break;
-                case "DINT":
-                    type_t = (ushort)tagType.DINT;
-                    break;
-                case "REAL":
-                    type_t = (ushort)tagType.REAL;
-                    break;
-                case "STRING":
-                    type_t = (ushort)tagType.STRING;
-                    break;
-                default:
-                    Console.WriteLine($"Unknown type : {data["data_type"]}");
-                    break;
-            }
-
-            attributes.Add(new tag_attribute
-            {
-                Tag = new Tag
+                string name = data["Name"].ToString();
+                string path = data["Path"].ToString(); // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
+                ushort type_t = 0;
+                switch (data["DataType"].ToString())
                 {
-                    Name = data["Name"].ToString(),
-                    Path = data["Path"].ToString(), // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
-                    Gateway = plc_address,
-                    PlcType = _plc_type,
-                    Protocol = _plc_protocol
-                },
-                TagInfo = new TagInfo
-                {
-                    Name = data["Name"].ToString(),
-                    Type = type_t
+                    case "BOOL":
+                        type_t = (ushort)tagType.BOOL;
+                        break;
+                    case "INT":
+                        type_t = (ushort)tagType.INT;
+                        break;
+                    case "DINT":
+                        type_t = (ushort)tagType.DINT;
+                        break;
+                    case "REAL":
+                        type_t = (ushort)tagType.REAL;
+                        break;
+                    case "STRING":
+                        type_t = (ushort)tagType.STRING;
+                        break;
+                    default:
+                        Console.WriteLine($"Unknown type : {data["data_type"]}");
+                        break;
                 }
-            });
-            if (!_stub_plc)
+
+                attributes.Add(new tag_attribute
+                {
+                    Tag = new Tag
+                    {
+                        Name = name,
+                        Path = path,
+                        Gateway = plc_address,
+                        PlcType = _plc_type,
+                        Protocol = _plc_protocol
+                    },
+                    TagInfo = new TagInfo
+                    {
+                        Name = name,
+                        Type = type_t
+                    }
+                });
+                if (!_stub_plc)
+                {
+                    attributes.Last().Tag.Initialize();
+                }
+            }
+            catch (Exception ex)
             {
-                attributes.Last().Tag.Initialize();
+                Console.WriteLine($"Error setting up tag '{data.ToJsonString()}' : {ex.Message}");
             }
         }
     }
