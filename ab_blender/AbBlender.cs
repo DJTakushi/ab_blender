@@ -57,17 +57,6 @@ public class AbBlender : BackgroundService
             Environment.Exit(1);
         }
         Console.WriteLine($"plc_address : {plc_address}");
-
-        // Setup RabbitMQ if environment variables are present
-        if (HasRabbitMqConfig())
-        {
-            _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)!;
-            _rmq_rk = Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY);
-        }
-        else
-        {
-            Console.WriteLine("RabbitMQ configuration not found; skipping RabbitMQ setup.");
-        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -114,6 +103,8 @@ public class AbBlender : BackgroundService
 
                 Console.WriteLine($"{_rmq_exchange} exchange created; rmq connection established.");
             }
+            _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE);
+            _rmq_rk = Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY);
         }
         catch (Exception ex)
         {
@@ -212,28 +203,26 @@ public class AbBlender : BackgroundService
             {
                 switch (attr.TagInfo.Type)  // TODO ; reaplce this wiht deprecated numeric type (TagInfo.Type)
                 {
-                    case (ushort)tagType.BOOL:
-                        break; // TODO : this breaks in my testing
-                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
-                        break;
-                    case (ushort)tagType.INT:
-                        break; // TODO : this breaks in my testing
-                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
-                        break;
-                    case (ushort)tagType.DINT:
-                        break; // TODO : this breaks in my testing
-                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
-                        break;
                     case (ushort)tagType.REAL:
                         data["tags"]![attr.TagInfo.Name] = attr.Tag.GetFloat32(0);
                         break;
+                    /* TODO : this breaks in my testing but should work when plc is not stubbed
+                    case (ushort)tagType.BOOL:
+                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
+                        break;
+                    case (ushort)tagType.INT:
+                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
+                        break;
+                    case (ushort)tagType.DINT:
+                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
+                        break;
                     case (ushort)tagType.STRING:
-                        break; // TODO : this breaks in my testing
                         data["tags"]![attr.TagInfo.Name] = attr.Tag.GetString(0);
                         break;
                     default:
                         Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
                         break;
+                    */
                 }
             }
             catch (Exception ex)
