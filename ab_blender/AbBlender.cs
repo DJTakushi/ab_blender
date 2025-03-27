@@ -30,6 +30,7 @@ public class AbBlender : BackgroundService
     private const string RABBITMQ_EXCHANGE = "RABBITMQ_EXCHANGE";
     private const string RABBITMQ_ROUTING_KEY = "RABBITMQ_ROUTING_KEY";
     private const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
+    private const string TAG_DEF_FILE = "TAG_DEF_FILE";
 
     private readonly IRabbitMQConnectionManager _connectionManager;
     private ConnectionFactory? _outputFactory = null;
@@ -82,7 +83,7 @@ public class AbBlender : BackgroundService
                 else
                 {
 
-                    while(_outputs.Count > 0)
+                    while (_outputs.Count > 0)
                     {
                         Console.WriteLine($"{_outputs.Dequeue()}");
                     }
@@ -133,7 +134,13 @@ public class AbBlender : BackgroundService
 
     private static void LoadTagsFromJson()
     {
-        string jsonContent = File.ReadAllText("tags.json");
+        string tag_def_fp = Environment.GetEnvironmentVariable(TAG_DEF_FILE)!;
+        if (string.IsNullOrEmpty(tag_def_fp))
+        {
+            Console.WriteLine($"{TAG_DEF_FILE} environment variable not set; no tags will be configured");
+            return;
+        }
+        string jsonContent = File.ReadAllText(tag_def_fp);
         var jsonObj = JsonObject.Parse(jsonContent);
         foreach (var data in jsonObj!.AsArray())
         {
@@ -255,7 +262,7 @@ public class AbBlender : BackgroundService
 
         if (_outputChannel?.IsOpen == true)
         {
-            while(_outputs.Count > 0)
+            while (_outputs.Count > 0)
             {
                 var body = System.Text.Encoding.UTF8.GetBytes(_outputs.Dequeue());
                 var props = new BasicProperties();
