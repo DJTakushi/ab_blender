@@ -1,6 +1,4 @@
-using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Reflection.Metadata;
 using libplctag;
 using libplctag.DataTypes;
 using RabbitMQ.Client;
@@ -51,8 +49,6 @@ public class AbBlender : BackgroundService
         _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
 
         LoadTagsFromJson();
-
-        // InitializePlcTags();
 
         plc_address = Environment.GetEnvironmentVariable(PLC_IP)!;
         if (string.IsNullOrEmpty(plc_address))
@@ -131,18 +127,15 @@ public class AbBlender : BackgroundService
     private static void LoadTagsFromJson()
     {
         string jsonContent = File.ReadAllText("tags.json");
-
-        //process tags
-        // JObject json = JObject.Parse(str);
         var jsonObj = JsonObject.Parse(jsonContent);
-        foreach (var data in jsonObj.AsArray())
+        foreach (var data in jsonObj!.AsArray())
         {
             try
             {
-                string name = data["Name"].ToString();
-                string path = data["Path"].ToString(); // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
+                string name = data!["Name"]!.ToString();
+                string path = data!["Path"]!.ToString(); // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
                 ushort type_t = 0;
-                switch (data["DataType"].ToString())
+                switch (data!["DataType"]!.ToString())
                 {
                     case "BOOL":
                         type_t = (ushort)tagType.BOOL;
@@ -187,7 +180,7 @@ public class AbBlender : BackgroundService
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error setting up tag '{data.ToJsonString()}' : {ex.Message}");
+                Console.WriteLine($"Error setting up tag '{data!.ToJsonString()}' : {ex.Message}");
             }
         }
     }
@@ -208,8 +201,6 @@ public class AbBlender : BackgroundService
             ["app_version"] = _appVersion,
             ["tags"] = new JsonObject()
         };
-
-        var timestamp = DateTime.UtcNow;
 
         foreach (var attr in attributes)
         {
