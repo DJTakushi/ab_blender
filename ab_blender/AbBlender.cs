@@ -43,6 +43,7 @@ public class AbBlender : BackgroundService
     private static readonly PlcType _plc_type = GetPlcType();
     private static readonly Protocol _plc_protocol = GetPlcProtocol();
     private static readonly bool _stub_plc = GetPlcStub();
+    private string _output = "";
 
     public AbBlender(IRabbitMQConnectionManager connectionManager)
     {
@@ -65,11 +66,17 @@ public class AbBlender : BackgroundService
         {
             try
             {
+
+                await ReadTags();
                 if (HasRabbitMqConfig())
                 {
                     SetupConnectionsAsync();
+                    await publishOutputToRabbitMQ();
                 }
-                await ReadTags();  // TODO : break into separate components
+                else
+                {
+                    Console.WriteLine($"{_output}");
+                }
 
                 int readPeriodMs = int.Parse(Environment.GetEnvironmentVariable(READ_TAGS_PERIOD_MS) ?? "1000");
                 await Task.Delay(readPeriodMs, stoppingToken);
@@ -103,8 +110,6 @@ public class AbBlender : BackgroundService
 
                 Console.WriteLine($"{_rmq_exchange} exchange created; rmq connection established.");
             }
-            _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE);
-            _rmq_rk = Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY);
         }
         catch (Exception ex)
         {
@@ -206,23 +211,23 @@ public class AbBlender : BackgroundService
                     case (ushort)tagType.REAL:
                         data["tags"]![attr.TagInfo.Name] = attr.Tag.GetFloat32(0);
                         break;
-                    /* TODO : this breaks in my testing but should work when plc is not stubbed
-                    case (ushort)tagType.BOOL:
-                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
-                        break;
-                    case (ushort)tagType.INT:
-                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
-                        break;
-                    case (ushort)tagType.DINT:
-                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
-                        break;
-                    case (ushort)tagType.STRING:
-                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetString(0);
-                        break;
-                    default:
-                        Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
-                        break;
-                    */
+                        /* TODO : this breaks in my testing but should work when plc is not stubbed
+                        case (ushort)tagType.BOOL:
+                            data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
+                            break;
+                        case (ushort)tagType.INT:
+                            data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
+                            break;
+                        case (ushort)tagType.DINT:
+                            data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
+                            break;
+                        case (ushort)tagType.STRING:
+                            data["tags"]![attr.TagInfo.Name] = attr.Tag.GetString(0);
+                            break;
+                        default:
+                            Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
+                            break;
+                        */
                 }
             }
             catch (Exception ex)
@@ -232,12 +237,16 @@ public class AbBlender : BackgroundService
 
         }
 
-        string jsonMessage = data.ToJsonString();
+        string _output = data.ToJsonString();
+    }
+    private async Task publishOutputToRabbitMQ()
+    {
+        _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE);
+        _rmq_rk = Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY);
 
-        // Publish to RabbitMQ if configured
         if (_outputChannel?.IsOpen == true)
         {
-            var body = System.Text.Encoding.UTF8.GetBytes(jsonMessage);
+            var body = System.Text.Encoding.UTF8.GetBytes(_output);
             var props = new BasicProperties();
             await _outputChannel.BasicPublishAsync(
                 exchange: _rmq_exchange!,
@@ -245,10 +254,6 @@ public class AbBlender : BackgroundService
                         mandatory: false,
                         basicProperties: props,
                         body: body);
-        }
-        else
-        {
-            Console.WriteLine($"jsonMessage : {jsonMessage}");
         }
     }
 
