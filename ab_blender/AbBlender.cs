@@ -2,9 +2,18 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Reflection.Metadata;
 using libplctag;
+using libplctag.DataTypes;
 using RabbitMQ.Client;
 using RmqConnection;
 
+public enum tagType
+{
+    BOOL,
+    INT,
+    DINT = 196,
+    REAL = 202,
+    STRING
+}
 
 public class AbBlender : BackgroundService
 {
@@ -25,7 +34,7 @@ public class AbBlender : BackgroundService
     private IConnection? _outputConnection = null;
     private IChannel? _outputChannel = null;
 
-    private static List<TagDefinition> _tagDefs = [];
+    private static List<TagInfo> _tagDefs = [];
     private static readonly Dictionary<string, Tag> _plcTags = [];
     private static readonly string _appVersion = "1.0.0";
     private static string? plc_address;
@@ -120,8 +129,41 @@ public class AbBlender : BackgroundService
     private static void LoadTagsFromJson()
     {
         string jsonContent = File.ReadAllText("tags.json");
-        _tagDefs = JsonSerializer.Deserialize<List<TagDefinition>>(jsonContent)
-            ?? throw new Exception("Failed to load tags from tags.json");
+
+        //process tags
+        // JObject json = JObject.Parse(str);
+        var jsonObj = JsonObject.Parse(jsonContent);
+        foreach (var data in jsonObj.AsArray())
+        {
+            ushort type_t = 0;
+            switch (data["DataType"].ToString())
+            {
+                case "BOOL":
+                    type_t = (ushort)tagType.BOOL;
+                    break;
+                case "INT":
+                    type_t = (ushort)tagType.INT;
+                    break;
+                case "DINT":
+                    type_t = (ushort)tagType.DINT;
+                    break;
+                case "REAL":
+                    type_t = (ushort)tagType.REAL;
+                    break;
+                case "STRING":
+                    type_t = (ushort)tagType.STRING;
+                    break;
+                default:
+                    Console.WriteLine($"Unknown type : {data["data_type"]}");
+                    break;
+            }
+
+            _tagDefs.Add(new TagInfo
+            {
+                Name = data["Name"].ToString(),
+                Type = type_t
+            });
+        }
     }
     public static bool HasRabbitMqConfig()
     {
@@ -152,33 +194,31 @@ public class AbBlender : BackgroundService
             Tag this_plc_tag = _plcTags[tag.Name!];
             try
             {
-                switch (tag.DataType)
+                switch (tag.Type)  // TODO ; reaplce this wiht deprecated numeric type (TagInfo.Type)
                 {
-                    case "BOOL":
-                        data["tags"]![tag.Name!] = this_plc_tag.GetBit(0); // TODO : this breaks in my testing
+                    case (ushort)tagType.BOOL:
+                        // data["tags"]![tag.Name!] = this_plc_tag.GetBit(0); // TODO : this breaks in my testing
                         break;
-                    case "INT":
-                        data["tags"]![tag.Name!] = this_plc_tag.GetInt16(0);// TODO : this breaks in my testing
+                    case (ushort)tagType.INT:
+                        // data["tags"]![tag.Name!] = this_plc_tag.GetInt16(0);// TODO : this breaks in my testing
                         break;
-                    case "DINT":
-                        data["tags"]![tag.Name!] = this_plc_tag.GetInt32(0);// TODO : this breaks in my testing
+                    case (ushort)tagType.DINT:
+                        // data["tags"]![tag.Name!] = this_plc_tag.GetInt32(0);// TODO : this breaks in my testing
                         break;
-                    case "REAL":
+                    case (ushort)tagType.REAL:
                         data["tags"]![tag.Name!] = this_plc_tag.GetFloat32(0);
                         break;
-                    case "STRING":
+                    case (ushort)tagType.STRING:
                         data["tags"]![tag.Name!] = this_plc_tag.GetString(0);
                         break;
-                    case "":  //blank DataTypes exist
-                        break;
                     default:
-                        Console.WriteLine($"Unknown type : {tag.DataType}");
+                        Console.WriteLine($"Unknown type : {tag.Type}");
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.DataType}' : {ex.Message}");
+                Console.WriteLine($"Error in ReadTags for tag '{tag.Name}', type '{tag.Type}' : {ex.Message}");
             }
 
         }
@@ -202,14 +242,43 @@ public class AbBlender : BackgroundService
             Console.WriteLine($"jsonMessage : {jsonMessage}");
         }
     }
+
+    // private void getPlcTagsFromMapper()
+    // {  // TODO : create an enum for types that matches mapper.
+    //     var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE?!?
+    //     {
+    //         Gateway = plc_address,
+    //         Path = "1,0",  // TODO ; un-hardcode this
+    //         PlcType = PlcType.ControlLogix,
+    //         Protocol = Protocol.ab_eip,
+    //         Name = "@tags"
+    //     };
+
+    //     tags.Read();
+    //     Console.WriteLine($"{tags.Value}");
+    //     foreach (var tag in tags.Value)
+    //     {
+
+    //         //     ExampleRW.Run( tag.Name, PlcType.Micro800 , Protocol.ab_eip);
+    //         var myTag = new Tag()
+    //         {
+    //             Name = $"{tag.Name}",
+    //             Gateway = "172.16.31.2",
+    //             Path = "1,0",
+    //             PlcType = PlcType.ControlLogix,
+    //             Protocol = Protocol.ab_eip
+    //         };
+    //         Console.WriteLine($"tag: {tag.Name} Time: {DateTime.Now} value: {myTag.GetFloat32(0)}");
+    //     }
+    // }
     private static void InitializePlcTags()
-    {
+    { // TODO  : integrate this with LoadTagsFromJson
         foreach (var tagDef in _tagDefs)
         {
             var tag = new Tag()
             {
                 Name = tagDef.Name,
-                Path = tagDef.Path, // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
+                Path = "1,0",//tagDef.Path, // WARNING :  https://github.com/libplctag/libplctag/wiki/Tag-String-Attributes
                 Gateway = plc_address,
                 PlcType = _plc_type,
                 Protocol = _plc_protocol
@@ -288,11 +357,4 @@ public class AbBlender : BackgroundService
         }
         return protocol;
     }
-}
-
-class TagDefinition
-{
-    public string? Name { get; set; }
-    public string? DataType { get; set; }
-    public string? Path { get; set; }
 }
