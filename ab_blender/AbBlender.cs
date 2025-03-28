@@ -70,12 +70,10 @@ public class AbBlender : BackgroundService
                 _outputConnection = null;
 
                 _outputFactory = _connectionManager.CreateFactory(""); // TODO : use "OUTPUT_"
-                string c_name = Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_CONNECTION_NAME)!;
-                _outputConnection = await _connectionManager.CreateConnection(_outputFactory, c_name);
+                _outputConnection = await _connectionManager.CreateConnection(_outputFactory, EnvVarHelper.GetRmqConnectionName());
                 _outputChannel = await _outputConnection.CreateChannelAsync();
 
-                _rmq_exchange = Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_EXCHANGE)!;
-                await _outputChannel.ExchangeDeclareAsync(_rmq_exchange, "topic");
+                await _outputChannel.ExchangeDeclareAsync(EnvVarHelper.GetRmqExchange(), "topic");
 
                 Console.WriteLine($"{_rmq_exchange} exchange created; rmq connection established.");
             }
@@ -89,20 +87,8 @@ public class AbBlender : BackgroundService
         }
     }
 
-    public static bool HasRabbitMqConfig()
-    {
-        return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_HOST)) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_USER)) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_PASS)) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_EXCHANGE)) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_ROUTING_KEY)) &&
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_CONNECTION_NAME));
-    }
     private async Task publishOutputToRabbitMQ()
     {
-        _rmq_exchange = Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_EXCHANGE);
-        _rmq_rk = Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_ROUTING_KEY);
-
         if (_outputChannel?.IsOpen == true)
         {
             while (_outputs.Count > 0)
@@ -110,8 +96,8 @@ public class AbBlender : BackgroundService
                 var body = System.Text.Encoding.UTF8.GetBytes(_outputs.Dequeue());
                 var props = new BasicProperties();
                 await _outputChannel.BasicPublishAsync(
-                    exchange: _rmq_exchange!,
-                            routingKey: _rmq_rk!,
+                    exchange: EnvVarHelper.GetRmqExchange()!,
+                            routingKey: EnvVarHelper.GetRmqRoutingKey()!,
                             mandatory: false,
                             basicProperties: props,
                             body: body);

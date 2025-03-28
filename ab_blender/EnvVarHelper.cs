@@ -7,13 +7,37 @@ public static class EnvVarHelper
     private const string PLC_PROTOCOL = "PLC_PROTOCOL";
     private const string STUB_PLC = "STUB_PLC";
     private const string READ_TAGS_PERIOD_MS = "READ_TAGS_PERIOD_MS";
-    public const string RABBITMQ_HOST = "RABBITMQ_HOST";
-    public const string RABBITMQ_USER = "RABBITMQ_USER";
-    public const string RABBITMQ_PASS = "RABBITMQ_PASS";
-    public const string RABBITMQ_EXCHANGE = "RABBITMQ_EXCHANGE";
-    public const string RABBITMQ_ROUTING_KEY = "RABBITMQ_ROUTING_KEY";
-    public const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
+    private const string RABBITMQ_HOST = "RABBITMQ_HOST";
+    private const string RABBITMQ_USER = "RABBITMQ_USER";
+    private const string RABBITMQ_PASS = "RABBITMQ_PASS";
+    private const string RABBITMQ_EXCHANGE = "RABBITMQ_EXCHANGE";
+    private const string RABBITMQ_ROUTING_KEY = "RABBITMQ_ROUTING_KEY";
+    private const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
     private const string TAG_DEF_FILE = "TAG_DEF_FILE";
+    public static string GetRmqHost()
+    {
+        return Environment.GetEnvironmentVariable(RABBITMQ_HOST)!;
+    }
+    public static string GetRmqUser()
+    {
+        return Environment.GetEnvironmentVariable(RABBITMQ_USER)!;
+    }
+    public static string GetRmqPass()
+    {
+        return Environment.GetEnvironmentVariable(RABBITMQ_PASS)!;
+    }
+    public static string GetRmqExchange()
+    {
+        return Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)!;
+    }
+    public static string GetRmqRoutingKey()
+    {
+        return Environment.GetEnvironmentVariable(RABBITMQ_ROUTING_KEY)!;
+    }
+    public static string GetRmqConnectionName()
+    {
+        return Environment.GetEnvironmentVariable(RABBITMQ_CONNECTION_NAME)!;
+    }
     public static int GetReadTagsPeriodMs()
     {
         int default_ms = 1000;
