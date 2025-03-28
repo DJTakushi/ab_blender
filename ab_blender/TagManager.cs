@@ -3,7 +3,7 @@ using libplctag;
 using libplctag.DataTypes;
 using System.Text.Json.Nodes;
 
-public enum tagType // TODO : confirm these values
+public enum TagType // TODO : confirm these values
 {
     BOOL,
     SINT = 193, //  193, addr, 3, 1 
@@ -59,19 +59,19 @@ class TagManager
                 switch (data!["DataType"]!.ToString())
                 {
                     case "BOOL":
-                        type_t = (ushort)tagType.BOOL;
+                        type_t = (ushort)TagType.BOOL;
                         break;
                     case "INT":
-                        type_t = (ushort)tagType.INT;
+                        type_t = (ushort)TagType.INT;
                         break;
                     case "DINT":
-                        type_t = (ushort)tagType.DINT;
+                        type_t = (ushort)TagType.DINT;
                         break;
                     case "REAL":
-                        type_t = (ushort)tagType.REAL;
+                        type_t = (ushort)TagType.REAL;
                         break;
                     case "STRING":
-                        type_t = (ushort)tagType.STRING;
+                        type_t = (ushort)TagType.STRING;
                         break;
                     default:
                         Console.WriteLine($"Unknown type : {data["data_type"]}");
@@ -159,23 +159,23 @@ class TagManager
             {
                 switch (attr.TagInfo.Type)
                 {
-                    case (ushort)tagType.REAL:
+                    case (ushort)TagType.REAL:
                         data["tags"]![attr.TagInfo.Name] = attr.Tag.GetFloat32(0);
                         break;
                     // TODO :  re-add this
-                    // case (ushort)tagType.BOOL:
+                    // case (ushort)TagType.BOOL:
                     //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
                     //     break;
-                    // case (ushort)tagType.SINT:
+                    // case (ushort)TagType.SINT:
                     //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt8(0);
                     //     break;
-                    // case (ushort)tagType.INT:
+                    // case (ushort)TagType.INT:
                     //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
                     //     break;
-                    // case (ushort)tagType.DINT:
+                    // case (ushort)TagType.DINT:
                     //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
                     //     break;
-                    // case (ushort)tagType.STRING:
+                    // case (ushort)TagType.STRING:
                     //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetString(0);
                     //     break;
                     // default:
