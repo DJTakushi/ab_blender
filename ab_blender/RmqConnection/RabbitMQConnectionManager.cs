@@ -5,6 +5,15 @@ namespace RmqConnection
 {
     public class RabbitMQConnectionManager : IRabbitMQConnectionManager
     {
+        public bool IsConfigurable(){
+        return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_HOST)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_USER)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_PASS)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_EXCHANGE)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_ROUTING_KEY)) &&
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(EnvVarHelper.RABBITMQ_CONNECTION_NAME));
+        }
+
         public ConnectionFactory CreateFactory(string prefix)
         {
             var host = Environment.GetEnvironmentVariable($"{prefix}RABBITMQ_HOST");

@@ -34,7 +34,7 @@ public class AbBlender : BackgroundService
             try
             {
                 _outputs.Enqueue(_tag_manager.genTagTelemetry());
-                if (HasRabbitMqConfig())
+                if (_connectionManager.IsConfigurable())
                 {
                     SetupConnectionsAsync();
                     await publishOutputToRabbitMQ();
