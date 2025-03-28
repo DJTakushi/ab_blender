@@ -285,7 +285,7 @@ public class AbBlender : BackgroundService
             var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE
             {
                 Gateway = plc_address,
-                Path = "1,0",  // TODO ; consider looping with this
+                Path = "1,0",  // TODO ; consider looping through potential values
                 PlcType = _plc_type,
                 Protocol = _plc_protocol,
                 Name = "@tags"
