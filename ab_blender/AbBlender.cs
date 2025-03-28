@@ -44,7 +44,7 @@ public class AbBlender : BackgroundService
     private static string? _rmq_rk;
     private static readonly PlcType _plc_type = GetPlcType();
     private static readonly Protocol _plc_protocol = GetPlcProtocol();
-    private static readonly bool _stub_plc = GetPlcStub();
+    private static readonly bool _stub_plc = GetPlcStub(); // TODO : use depencency inection instead of branches
     private readonly Queue<string> _outputs = [];
 
     public AbBlender(IRabbitMQConnectionManager connectionManager)
