@@ -2,18 +2,18 @@ using libplctag;
 
 public static class EnvVarHelper
 {
-    public const string PLC_IP = "PLC_IP";
-    public const string PLC_TYPE = "PLC_TYPE";
-    public const string PLC_PROTOCOL = "PLC_PROTOCOL";
-    public const string STUB_PLC = "STUB_PLC";
-    public const string READ_TAGS_PERIOD_MS = "READ_TAGS_PERIOD_MS";
+    private const string PLC_IP = "PLC_IP";
+    private const string PLC_TYPE = "PLC_TYPE";
+    private const string PLC_PROTOCOL = "PLC_PROTOCOL";
+    private const string STUB_PLC = "STUB_PLC";
+    private const string READ_TAGS_PERIOD_MS = "READ_TAGS_PERIOD_MS";
     public const string RABBITMQ_HOST = "RABBITMQ_HOST";
     public const string RABBITMQ_USER = "RABBITMQ_USER";
     public const string RABBITMQ_PASS = "RABBITMQ_PASS";
     public const string RABBITMQ_EXCHANGE = "RABBITMQ_EXCHANGE";
     public const string RABBITMQ_ROUTING_KEY = "RABBITMQ_ROUTING_KEY";
     public const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
-    public const string TAG_DEF_FILE = "TAG_DEF_FILE";
+    private const string TAG_DEF_FILE = "TAG_DEF_FILE";
     public static int GetReadTagsPeriodMs()
     {
         int default_ms = 1000;
@@ -91,7 +91,6 @@ public static class EnvVarHelper
         return plc_type;
     }
     public static bool GetPlcStub()
-    // TODO :  consider breaking env-var content out into a separate class for separation of concerns and better testing
     {
         string? stub_plc_s = Environment.GetEnvironmentVariable(STUB_PLC);
         if (!string.IsNullOrEmpty(stub_plc_s))
