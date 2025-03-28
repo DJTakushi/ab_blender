@@ -1,4 +1,3 @@
-using RabbitMQ.Client;
 using RmqConnection;
 
 // TODO : identify PLCs IP address

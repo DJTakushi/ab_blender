@@ -1,5 +1,3 @@
-using RabbitMQ.Client;
-
 namespace RmqConnection
 {
     public interface IRabbitMQConnectionManager
