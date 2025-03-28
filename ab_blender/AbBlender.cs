@@ -4,7 +4,7 @@ using libplctag.DataTypes;
 using RabbitMQ.Client;
 using RmqConnection;
 
-public enum tagType // TODO : investigate these values
+public enum tagType // TODO : confirm these values
 {
     BOOL,
     SINT = 193, //  193, addr, 3, 1 
@@ -36,7 +36,7 @@ public class AbBlender : BackgroundService
     private readonly IRabbitMQConnectionManager _connectionManager;
     private ConnectionFactory? _outputFactory = null;
     private IConnection? _outputConnection = null;
-    private IChannel? _outputChannel = null;
+    private IChannel? _outputChannel = null; // TODO : consider breaking RMQ out into a separate class (better than current IRabbitMQConnectionManager)
     private static List<tag_attribute> attributes = [];
     private static readonly string _appVersion = "1.0.0";
     private static string? plc_address;
