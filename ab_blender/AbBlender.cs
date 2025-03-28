@@ -10,7 +10,7 @@ public static class AppInfo
 public class AbBlender : BackgroundService
 {
     private readonly IRabbitMQConnectionManager _connectionManager;
-    private TagManager _tag_manager = new();
+    private readonly TagManager _tag_manager = new();
     private readonly Queue<string> _outputs = [];
 
     public AbBlender(IRabbitMQConnectionManager connectionManager)
