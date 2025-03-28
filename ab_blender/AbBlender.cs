@@ -284,7 +284,7 @@ public class AbBlender : BackgroundService
     { // NOTE : https://github.com/libplctag/libplctag.NET/issues/406
         try
         {
-            var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE
+            var tag_infos = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE
             {
                 Gateway = plc_address,
                 Path = "1,0",  // TODO ; consider looping through potential values
@@ -302,19 +302,19 @@ public class AbBlender : BackgroundService
 
             if (!_stub_plc)
             {
-                tags.Read();
-                _outputs.Enqueue($"{tags.Value}");
-                foreach (var tag in tags.Value)
+                tag_infos.Read();
+                _outputs.Enqueue($"{tag_infos.Value}");
+                foreach (var tag_info in tag_infos.Value)
                 {
                     var myTag = new Tag()
                     {
-                        Name = $"{tag.Name}",
+                        Name = $"{tag_info.Name}",
                         Path = "1,0", // assuming default
                         Gateway = plc_address,
                         PlcType = _plc_type,
                         Protocol = _plc_protocol
                     };
-                    switch (tag.Type)
+                    switch (tag_info.Type)
                     {
                         case (ushort)tagType.REAL:
                             data["tags"]![myTag.Name] = myTag.GetFloat32(0);
@@ -332,7 +332,7 @@ public class AbBlender : BackgroundService
                             data["tags"]![myTag.Name] = myTag.GetString(0);
                             break;
                         default:
-                            Console.WriteLine($"Unknown type : {tag.Type}");
+                            Console.WriteLine($"Unknown type : {tag_info.Type}");
                             break;
                     }
                 }
