@@ -115,7 +115,8 @@ public class AbBlender : BackgroundService
                 _outputConnection = null;
 
                 _outputFactory = _connectionManager.CreateFactory(""); // TODO : use "OUTPUT_"
-                _outputConnection = await _connectionManager.CreateConnection(_outputFactory, "ab_blender_output");  // TODO : use env-var
+                string c_name = Environment.GetEnvironmentVariable(RABBITMQ_CONNECTION_NAME)!;
+                _outputConnection = await _connectionManager.CreateConnection(_outputFactory, c_name);
                 _outputChannel = await _outputConnection.CreateChannelAsync();
 
                 _rmq_exchange = Environment.GetEnvironmentVariable(RABBITMQ_EXCHANGE)!;
