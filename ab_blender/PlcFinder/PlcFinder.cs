@@ -8,14 +8,12 @@ using System.Collections.Generic;
 // write a csharp application that will search a given range of ip addresses for a  connected Allen Bradley ControlLogix Plc
 class PlcFinder
 {
-    static async Task FindPlc(string[] args)
+    public static string[] plc_ips = [];
+
+    static async Task FindPlc(string startIp, string endIp)
     {
         Console.WriteLine("Allen-Bradley ControlLogix PLC Scanner");
         Console.WriteLine("-------------------------------------");
-
-        // Define IP range to scan
-        string startIp = "192.168.1.1";
-        string endIp = "192.168.1.254";
 
         Console.WriteLine($"Scanning range: {startIp} to {endIp}");
         await ScanIpRange(startIp, endIp);
@@ -69,6 +67,7 @@ class PlcFinder
                     if (await CheckPlcPort(ip))
                     {
                         Console.WriteLine($"Potential PLC found at {ip} - Port 44818 open");
+                        plc_ips.Append(ip);
                     }
                     else
                     {
