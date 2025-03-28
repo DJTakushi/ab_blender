@@ -12,7 +12,7 @@ public enum TagType // TODO : confirm these values
     REAL = 202, // confirmed in the field
     STRING = 33633
 }
-class tag_attribute
+class TagAttribute
 {
     public required Tag Tag { get; set; }
     public required TagInfo TagInfo { get; set; }
@@ -20,7 +20,7 @@ class tag_attribute
 
 class TagManager
 {
-    private List<tag_attribute> attributes = []; // TODO : make this a dict so a client can write a tag value
+    private List<TagAttribute> attributes = []; // TODO : make this a dict so a client can write a tag value
     public void readAllTags()
     {
         foreach (var attr in attributes)
@@ -78,7 +78,7 @@ class TagManager
                         break;
                 }
 
-                attributes.Add(new tag_attribute
+                attributes.Add(new TagAttribute
                 {
                     Tag = new Tag
                     {
@@ -124,7 +124,7 @@ class TagManager
                 // _outputs.Enqueue($"{tag_infos.Value}");
                 foreach (var tag_info in tag_infos.Value)
                 {
-                    attributes.Add(new tag_attribute
+                    attributes.Add(new TagAttribute
                     {
                         Tag = new Tag
                         {
