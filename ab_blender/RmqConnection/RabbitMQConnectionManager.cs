@@ -45,7 +45,7 @@ namespace RmqConnection
 
         private async Task<IConnection> CreateConnection(ConnectionFactory factory, string name) => await factory.CreateConnectionAsync(name);
 
-        public async void SetupConnectionsAsync()
+        public async Task SetupConnectionsAsync()
         {
             try
             {

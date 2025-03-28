@@ -28,7 +28,7 @@ public class AbBlender : BackgroundService
                 _outputs.Enqueue(_tag_manager.genTagTelemetry());
                 if (_connectionManager.IsConfigurable())
                 {
-                    _connectionManager.SetupConnectionsAsync();
+                    await _connectionManager.SetupConnectionsAsync();
                     publishOutputToRabbitMQ();
                 }
                 while (_outputs.Count > 0)

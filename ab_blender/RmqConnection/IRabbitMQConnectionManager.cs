@@ -4,7 +4,7 @@ namespace RmqConnection
     {
         public abstract bool IsConfigurable();
         public abstract bool IsOutputOpen();
-        public abstract void SetupConnectionsAsync();
+        public abstract Task SetupConnectionsAsync();
         public abstract void PublishOutputToRabbitMQ(string message);
     }
 }
