@@ -343,6 +343,7 @@ public class AbBlender : BackgroundService
         }
     }
     private static bool GetPlcStub()
+    // TODO :  consider breaking env-var content out into a separate class for separation of concerns and better testing
     {
         string? stub_plc_s = Environment.GetEnvironmentVariable(STUB_PLC);
         if (!string.IsNullOrEmpty(stub_plc_s))
