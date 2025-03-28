@@ -7,9 +7,10 @@ using RmqConnection;
 public enum tagType // TODO : investigate these values
 {
     BOOL,
-    INT,
-    DINT = 196,
-    REAL = 202,
+    SINT = 193, //  193, addr, 3, 1 
+    INT = 195, // 195, adr, 3,2
+    DINT = 196, // expressed by vars with "Dint" in their name
+    REAL = 202, // confirmed in the field
     STRING
 }
 class tag_attribute
@@ -224,7 +225,7 @@ public class AbBlender : BackgroundService
             }
             try
             {
-                switch (attr.TagInfo.Type)  // TODO ; reaplce this wiht deprecated numeric type (TagInfo.Type)
+                switch (attr.TagInfo.Type)
                 {
                     case (ushort)tagType.REAL:
                         data["tags"]![attr.TagInfo.Name] = attr.Tag.GetFloat32(0);
@@ -283,7 +284,7 @@ public class AbBlender : BackgroundService
             var tags = new Tag<TagInfoPlcMapper, TagInfo[]>()  // OBSOLETE
             {
                 Gateway = plc_address,
-                Path = "1,0",  // TODO ; un-hardcode this
+                Path = "1,0",  // TODO ; consider looping with this
                 PlcType = _plc_type,
                 Protocol = _plc_protocol,
                 Name = "@tags"
