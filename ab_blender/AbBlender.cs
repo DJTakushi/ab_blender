@@ -15,10 +15,6 @@ public class AbBlender : BackgroundService
     private ConnectionFactory? _outputFactory = null;
     private IConnection? _outputConnection = null;
     private IChannel? _outputChannel = null; // TODO : consider breaking RMQ out into a separate class (better than current IRabbitMQConnectionManager)
-    private static List<tag_attribute> attributes = [];
-    private static string? _rmq_exchange;
-    private static string? _rmq_rk;
-    private static readonly bool _stub_plc = EnvVarHelper.GetPlcStub(); // TODO : use depencency inection instead of branches
     private readonly Queue<string> _outputs = [];
 
     public AbBlender(IRabbitMQConnectionManager connectionManager)
@@ -75,7 +71,7 @@ public class AbBlender : BackgroundService
 
                 await _outputChannel.ExchangeDeclareAsync(EnvVarHelper.GetRmqExchange(), "topic");
 
-                Console.WriteLine($"{_rmq_exchange} exchange created; rmq connection established.");
+                Console.WriteLine($"rmq connection established.");
             }
         }
         catch (Exception ex)
