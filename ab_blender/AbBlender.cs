@@ -11,7 +11,7 @@ public enum tagType // TODO : confirm these values
     INT = 195, // 195, adr, 3,2
     DINT = 196, // expressed by vars with "Dint" in their name
     REAL = 202, // confirmed in the field
-    STRING
+    STRING = 33633
 }
 class tag_attribute
 {
