@@ -4,6 +4,8 @@ using libplctag.DataTypes;
 using RabbitMQ.Client;
 using RmqConnection;
 
+// TODO : identify PLCs IP address
+
 public enum tagType // TODO : confirm these values
 {
     BOOL,
