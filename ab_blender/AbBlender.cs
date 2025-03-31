@@ -10,12 +10,14 @@ public static class AppInfo
 public class AbBlender : BackgroundService
 {
     private readonly IRabbitMQConnectionManager _connectionManager;
+    private readonly IPlcFinder _plcFinder;
     private readonly TagManager _tag_manager = new();
     private readonly Queue<string> _outputs = [];
 
-    public AbBlender(IRabbitMQConnectionManager connectionManager)
+    public AbBlender(IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
     {
         _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
+        _plcFinder = plcFinder ?? throw new ArgumentNullException(nameof(plcFinder));
         _tag_manager.load_tags();
     }
 
