@@ -156,6 +156,9 @@ class TagManager
         {
             ["timestamp"] = DateTime.UtcNow.ToString("O"),
             ["app_version"] = AppInfo._appVersion,
+            ["plc_address"] = _plc_address,
+            ["plc_type"] = _plc_type.ToString(),
+            ["plc_protocol"] = _plc_protocol.ToString(),
             ["tags"] = new JsonObject()
         };
 
