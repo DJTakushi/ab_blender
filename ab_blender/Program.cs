@@ -12,6 +12,7 @@ class Program
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHostedService<AbBlender>();
+                services.AddSingleton<IPlcFinder, PlcFinder>();
                 services.AddSingleton<IRabbitMQConnectionManager, RabbitMQConnectionManager>();
 
                 // services.AddLogging(logging =>
