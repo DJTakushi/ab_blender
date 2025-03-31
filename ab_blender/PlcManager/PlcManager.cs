@@ -13,7 +13,7 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
     {
         foreach (var attr in attributes)
         {
-            attr.Tag.Read();
+            attr.ReadTag();
         }
     }
     public void load_tags()
@@ -63,26 +63,13 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
                         break;
                 }
 
-                attributes.Add(new TagAttribute
+                TagInfo tag_info = new TagInfo
                 {
-                    Tag = new Tag
-                    {
-                        Name = name,
-                        Path = path,
-                        Gateway = plc_address,
-                        PlcType = plc_type,
-                        Protocol = plc_protocol
-                    },
-                    TagInfo = new TagInfo
-                    {
-                        Name = name,
-                        Type = type_t
-                    }
-                });
-                // if (!_stub_plc)
-                // {
-                //     attributes.Last().Tag.Initialize();
-                // }
+                    Name = name,
+                    Type = type_t
+                };
+                attributes.Add(new TagAttribute(tag_info, plc_address, plc_type, plc_protocol));
+                attributes.Last().InitializeTag();
             }
             catch (Exception ex)
             {
@@ -109,18 +96,7 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
                 // _outputs.Enqueue($"{tag_infos.Value}");
                 foreach (var tag_info in tag_infos.Value)
                 {
-                    attributes.Add(new TagAttribute
-                    {
-                        Tag = new Tag
-                        {
-                            Name = $"{tag_info.Name}",
-                            Path = "1,0", // assuming default,
-                            Gateway = plc_address,
-                            PlcType = plc_type,
-                            Protocol = plc_protocol
-                        },
-                        TagInfo = tag_info
-                    });
+                    attributes.Add(new TagAttribute(tag_info, plc_address, plc_type, plc_protocol));
                 }
             }
         }
@@ -148,27 +124,26 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
                 switch (attr.TagInfo.Type)
                 {
                     case (ushort)TagType.REAL:
-                        data["tags"]![attr.TagInfo.Name] = attr.Tag.GetFloat32(0);
+                        data["tags"]![attr.TagInfo.Name] = attr.GetDoubleTagValue(0);
                         break;
-                        // TODO :  re-add this
-                        // case (ushort)TagType.BOOL:
-                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
-                        //     break;
-                        // case (ushort)TagType.SINT:
-                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt8(0);
-                        //     break;
-                        // case (ushort)TagType.INT:
-                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
-                        //     break;
-                        // case (ushort)TagType.DINT:
-                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
-                        //     break;
-                        // case (ushort)TagType.STRING:
-                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetString(0);
-                        //     break;
-                        // default:
-                        //     Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
-                        //     break;
+                    case (ushort)TagType.BOOL:
+                        data["tags"]![attr.TagInfo.Name] = attr.GetBoolTagValue(0);
+                        break;
+                    case (ushort)TagType.SINT:
+                        data["tags"]![attr.TagInfo.Name] = attr.GetSintTagValue(0);
+                        break;
+                    case (ushort)TagType.INT:
+                        data["tags"]![attr.TagInfo.Name] = attr.GetIntTagValue(0);
+                        break;
+                    case (ushort)TagType.DINT:
+                        data["tags"]![attr.TagInfo.Name] = attr.GetDintTagValue(0);
+                        break;
+                    case (ushort)TagType.STRING:
+                        data["tags"]![attr.TagInfo.Name] = attr.GetStringTagValue(0);
+                        break;
+                    default:
+                        Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
+                        break;
                 }
             }
             catch (Exception ex)
