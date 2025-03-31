@@ -11,7 +11,7 @@ public class AbBlender : BackgroundService
 {
     private readonly IRabbitMQConnectionManager _connectionManager;
     private readonly IPlcFinder _plcFinder;
-    private readonly TagManager _tag_manager; // TODO : refactor into list AND make interfaces
+    private readonly TagManager[] _tag_managers = []; // TODO : make interfaces
     private readonly Queue<string> _outputs = [];
 
     public AbBlender(IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
@@ -22,7 +22,7 @@ public class AbBlender : BackgroundService
         string? plc_address_ev = EnvVarHelper.GetPlcAddress();
         if (!string.IsNullOrEmpty(plc_address_ev))
         {
-            _tag_manager = new TagManager(plc_address_ev, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol());
+            _tag_managers.Append(new TagManager(plc_address_ev, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
         }
         else
         {
@@ -33,9 +33,15 @@ public class AbBlender : BackgroundService
                 Console.WriteLine("No PLCs found from EnvVar nor from scanning; exiting");
                 Environment.Exit(1);
             }
-            // _tag_manager = new TagManager(_plcFinder.GetPlcIps()[0], EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol());
+            foreach (string plc_ip in plc_ips)
+            {
+                _tag_managers.Append(new TagManager(plc_ip, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
+            }
         }
-        _tag_manager.load_tags();
+        foreach (TagManager tm in _tag_managers)
+        {
+            tm.load_tags();
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -44,7 +50,10 @@ public class AbBlender : BackgroundService
         {
             try
             {
-                _outputs.Enqueue(_tag_manager.genTagTelemetry());
+                foreach (TagManager tm in _tag_managers)
+                {
+                    _outputs.Enqueue(tm.genTagTelemetry());
+                }
                 if (_connectionManager.IsConfigurable())
                 {
                     await _connectionManager.SetupConnectionsAsync();
