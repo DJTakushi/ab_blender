@@ -9,20 +9,27 @@ using System.Collections.Generic;
 public class PlcFinder : IPlcFinder
 {
     public static string[] plc_ips = [];
-    public string[] GetPlcIps(){
+    public string[] GetPlcIps()
+    {
         return plc_ips;
     }
 
-    public async Task FindPlc(string startIp, string endIp)
+    public async Task FindPlc(string? startIp, string? endIp)
     {
         // Console.WriteLine("Allen-Bradley ControlLogix PLC Scanner");
         // Console.WriteLine("-------------------------------------");
+        if (string.IsNullOrEmpty(startIp) || string.IsNullOrEmpty(endIp))
+        {
+            return;
+        }
+        else
+        {
+            // Console.WriteLine($"Scanning range: {startIp} to {endIp}");
+            await ScanIpRange(startIp, endIp);
 
-        // Console.WriteLine($"Scanning range: {startIp} to {endIp}");
-        await ScanIpRange(startIp, endIp);
-
-        // Console.WriteLine("\nScan complete. Press any key to exit.");
-        // Console.ReadKey();
+            // Console.WriteLine("\nScan complete. Press any key to exit.");
+            // Console.ReadKey();
+        }
     }
 
     static async Task ScanIpRange(string startIp, string endIp)
