@@ -118,7 +118,6 @@ public static class EnvVarHelper
         {
             if (stub_plc_s == "true")
             {
-                Console.WriteLine($"{STUB_PLC} set ; stubbing PLC interactions");
                 return true;
             }
         }
