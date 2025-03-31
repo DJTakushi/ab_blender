@@ -14,25 +14,25 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
         PlcType = plc_type,
         Protocol = plc_protocol
     };
-    public void InitializeTag()
+    public virtual void InitializeTag()
     {
         if (!EnvVarHelper.GetPlcStub())
         {
             Tag.Initialize();
         }
     }
-    public void ReadTag()
+    public virtual void ReadTag()
     {
         if (!EnvVarHelper.GetPlcStub())
         {
             Tag.Read();
         }
     }
-    public double GetDoubleTagValue(int offset = 0)
+    public virtual double GetDoubleTagValue(int offset = 0)
     {
         return Tag.GetFloat32(offset);
     }
-    public bool GetBoolTagValue(int offset = 0)
+    public virtual bool GetBoolTagValue(int offset = 0)
     {
         if (!EnvVarHelper.GetPlcStub())
         {
@@ -43,7 +43,7 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
             return false;
         }
     }
-    public int GetSintTagValue(int offset = 0)
+    public virtual int GetSintTagValue(int offset = 0)
     {
         if (!EnvVarHelper.GetPlcStub())
         {
@@ -54,7 +54,7 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
             return 0;
         }
     }
-    public int GetIntTagValue(int offset = 0)
+    public virtual int GetIntTagValue(int offset = 0)
     {
         if (!EnvVarHelper.GetPlcStub())
         {
@@ -65,7 +65,7 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
             return 0;
         }
     }
-    public int GetDintTagValue(int offset = 0)
+    public virtual int GetDintTagValue(int offset = 0)
     {
         if (!EnvVarHelper.GetPlcStub())
         {
@@ -76,7 +76,7 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
             return 0;
         }
     }
-    public string GetStringTagValue(int offset = 0)
+    public virtual string GetStringTagValue(int offset = 0)
     {
         if (!EnvVarHelper.GetPlcStub())
         {
