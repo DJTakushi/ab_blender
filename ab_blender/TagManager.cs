@@ -12,7 +12,7 @@ public enum TagType // TODO : confirm these values
     REAL = 202, // confirmed in the field
     STRING = 33633
 }
-class TagAttribute
+class TagAttribute // TODO : make an interface and factory to replace stubbing
 {
     public required Tag Tag { get; set; }
     public required TagInfo TagInfo { get; set; }
@@ -20,6 +20,15 @@ class TagAttribute
 
 class TagManager
 {
+    private string _plc_address;
+    private PlcType _plc_type = EnvVarHelper.GetPlcType();
+    private Protocol _plc_protocol = EnvVarHelper.GetPlcProtocol();
+    public TagManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
+    {
+        this._plc_address = plc_address;
+        this._plc_type = plc_type;
+        this._plc_protocol = plc_protocol;
+    }
     private List<TagAttribute> attributes = []; // TODO : make this a dict so a client can write a tag value
     public void readAllTags()
     {
@@ -30,13 +39,10 @@ class TagManager
     }
     public void load_tags()
     {
-        string? plc_address  = EnvVarHelper.GetPlcAddress();
-        PlcType _plc_type = EnvVarHelper.GetPlcType();
-        Protocol _plc_protocol = EnvVarHelper.GetPlcProtocol();
-        LoadTagsFromJson(plc_address, _plc_type, _plc_protocol);
+        LoadTagsFromJson(_plc_address, _plc_type, _plc_protocol);
         if (attributes.Count > 0)
         {
-            identifyPlcTagsWithMapper(plc_address, _plc_type, _plc_protocol);
+            identifyPlcTagsWithMapper(_plc_address, _plc_type, _plc_protocol);
         }
     }
     private void LoadTagsFromJson(string plc_address, PlcType plc_type, Protocol plc_protocol)
@@ -162,25 +168,25 @@ class TagManager
                     case (ushort)TagType.REAL:
                         data["tags"]![attr.TagInfo.Name] = attr.Tag.GetFloat32(0);
                         break;
-                    // TODO :  re-add this
-                    // case (ushort)TagType.BOOL:
-                    //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
-                    //     break;
-                    // case (ushort)TagType.SINT:
-                    //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt8(0);
-                    //     break;
-                    // case (ushort)TagType.INT:
-                    //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
-                    //     break;
-                    // case (ushort)TagType.DINT:
-                    //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
-                    //     break;
-                    // case (ushort)TagType.STRING:
-                    //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetString(0);
-                    //     break;
-                    // default:
-                    //     Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
-                    //     break;
+                        // TODO :  re-add this
+                        // case (ushort)TagType.BOOL:
+                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetBit(0);
+                        //     break;
+                        // case (ushort)TagType.SINT:
+                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt8(0);
+                        //     break;
+                        // case (ushort)TagType.INT:
+                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt16(0);
+                        //     break;
+                        // case (ushort)TagType.DINT:
+                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetInt32(0);
+                        //     break;
+                        // case (ushort)TagType.STRING:
+                        //     data["tags"]![attr.TagInfo.Name] = attr.Tag.GetString(0);
+                        //     break;
+                        // default:
+                        //     Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
+                        //     break;
                 }
             }
             catch (Exception ex)
