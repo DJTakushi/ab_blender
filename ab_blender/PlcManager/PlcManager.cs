@@ -18,17 +18,11 @@ class TagAttribute // TODO : make an interface and factory to replace stubbing
     public required TagInfo TagInfo { get; set; }
 }
 
-class PlcManager
+class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
 {
-    private string _plc_address;
-    private PlcType _plc_type = EnvVarHelper.GetPlcType();
-    private Protocol _plc_protocol = EnvVarHelper.GetPlcProtocol();
-    public PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
-    {
-        this._plc_address = plc_address;
-        this._plc_type = plc_type;
-        this._plc_protocol = plc_protocol;
-    }
+    private readonly string _plc_address = plc_address;
+    private readonly PlcType _plc_type = plc_type;
+    private readonly Protocol _plc_protocol = plc_protocol;
     private List<TagAttribute> attributes = []; // TODO : make this a dict so a client can write a tag value
     public void readAllTags()
     {
