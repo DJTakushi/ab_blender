@@ -6,20 +6,23 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 // write a csharp application that will search a given range of ip addresses for a  connected Allen Bradley ControlLogix Plc
-class PlcFinder
+public class PlcFinder : IPlcFinder
 {
     public static string[] plc_ips = [];
+    public string[] GetPlcIps(){
+        return plc_ips;
+    }
 
-    static async Task FindPlc(string startIp, string endIp)
+    public async Task FindPlc(string startIp, string endIp)
     {
-        Console.WriteLine("Allen-Bradley ControlLogix PLC Scanner");
-        Console.WriteLine("-------------------------------------");
+        // Console.WriteLine("Allen-Bradley ControlLogix PLC Scanner");
+        // Console.WriteLine("-------------------------------------");
 
-        Console.WriteLine($"Scanning range: {startIp} to {endIp}");
+        // Console.WriteLine($"Scanning range: {startIp} to {endIp}");
         await ScanIpRange(startIp, endIp);
 
-        Console.WriteLine("\nScan complete. Press any key to exit.");
-        Console.ReadKey();
+        // Console.WriteLine("\nScan complete. Press any key to exit.");
+        // Console.ReadKey();
     }
 
     static async Task ScanIpRange(string startIp, string endIp)
