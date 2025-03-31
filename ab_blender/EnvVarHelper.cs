@@ -14,6 +14,8 @@ public static class EnvVarHelper
     private const string RABBITMQ_ROUTING_KEY = "RABBITMQ_ROUTING_KEY";
     private const string RABBITMQ_CONNECTION_NAME = "RABBITMQ_CONNECTION_NAME";
     private const string TAG_DEF_FILE = "TAG_DEF_FILE";
+    private const string START_IP = "START_IP";
+    private const string END_IP = "END_IP";
     public static string GetRmqHost()
     {
         return Environment.GetEnvironmentVariable(RABBITMQ_HOST)!;
@@ -59,14 +61,9 @@ public static class EnvVarHelper
         return Environment.GetEnvironmentVariable(TAG_DEF_FILE)!;
     }
 
-    public static string GetPlcAddress()
+    public static string? GetPlcAddress()
     {
-        string plc_address = Environment.GetEnvironmentVariable(PLC_IP)!;
-        if (string.IsNullOrEmpty(plc_address))
-        {
-            Console.WriteLine($"{PLC_IP} environment variable not set; exiting...");
-            Environment.Exit(1);
-        }
+        string? plc_address = Environment.GetEnvironmentVariable(PLC_IP)!;
         return plc_address;
     }
     public static Protocol GetPlcProtocol()
@@ -126,5 +123,15 @@ public static class EnvVarHelper
             }
         }
         return false;
+    }
+    public static string? GetStartIp()
+    {
+        string? start_ip = Environment.GetEnvironmentVariable(START_IP);
+        return start_ip;
+    }
+    public static string? GetEndIp()
+    {
+        string? end_ip = Environment.GetEnvironmentVariable(END_IP);
+        return end_ip;
     }
 }
