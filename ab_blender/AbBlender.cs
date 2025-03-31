@@ -11,7 +11,7 @@ public class AbBlender : BackgroundService
 {
     private readonly IRabbitMQConnectionManager _connectionManager;
     private readonly IPlcFinder _plcFinder;
-    private readonly Dictionary<string, TagManager> _tag_managers = []; // TODO : make interfaces
+    private readonly Dictionary<string, PlcManager> _tag_managers = []; // TODO : make interfaces
     private readonly Queue<string> _outputs = [];
 
     public AbBlender(IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
@@ -22,7 +22,7 @@ public class AbBlender : BackgroundService
         string? plc_address_ev = EnvVarHelper.GetPlcAddress();
         if (!string.IsNullOrEmpty(plc_address_ev))
         {
-            _tag_managers.Add(plc_address_ev, new TagManager(plc_address_ev, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
+            _tag_managers.Add(plc_address_ev, new PlcManager(plc_address_ev, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
         }
         else
         {
@@ -35,10 +35,10 @@ public class AbBlender : BackgroundService
             }
             foreach (string plc_ip in plc_ips)
             {
-                _tag_managers.Add(plc_ip, new TagManager(plc_ip, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
+                _tag_managers.Add(plc_ip, new PlcManager(plc_ip, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
             }
         }
-        foreach (KeyValuePair<string, TagManager> entry in _tag_managers)
+        foreach (KeyValuePair<string, PlcManager> entry in _tag_managers)
         {
             entry.Value.load_tags();
             Console.WriteLine($"Monitoring {entry.Key}");
@@ -51,7 +51,7 @@ public class AbBlender : BackgroundService
         {
             try
             {
-                foreach (KeyValuePair<string, TagManager> entry in _tag_managers)
+                foreach (KeyValuePair<string, PlcManager> entry in _tag_managers)
                 {
                     _outputs.Enqueue(entry.Value.genTagTelemetry());
                 }

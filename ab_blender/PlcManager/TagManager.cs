@@ -18,12 +18,12 @@ class TagAttribute // TODO : make an interface and factory to replace stubbing
     public required TagInfo TagInfo { get; set; }
 }
 
-class TagManager
+class PlcManager
 {
     private string _plc_address;
     private PlcType _plc_type = EnvVarHelper.GetPlcType();
     private Protocol _plc_protocol = EnvVarHelper.GetPlcProtocol();
-    public TagManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
+    public PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
     {
         this._plc_address = plc_address;
         this._plc_type = plc_type;
