@@ -3,7 +3,7 @@ using libplctag;
 using libplctag.DataTypes;
 
 // TODO : make an interface and factory to replace stubbing
-class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol plc_protocol)
+class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol plc_protocol) : ITagAttribute
 {
     public TagInfo TagInfo = tagInfo;
     private readonly Tag Tag = new Tag
