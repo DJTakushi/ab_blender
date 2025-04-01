@@ -3,8 +3,9 @@ using libplctag.DataTypes;
 using System.Text.Json.Nodes;
 
 
-class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
+class PlcManager(ITagAttributeFactory tag_factory, string plc_address, PlcType plc_type, Protocol plc_protocol)
 {
+    private readonly ITagAttributeFactory _TagFactory = tag_factory ?? throw new ArgumentNullException(nameof(ITagAttributeFactory));
     private readonly string _plc_address = plc_address;
     private readonly PlcType _plc_type = plc_type;
     private readonly Protocol _plc_protocol = plc_protocol;
@@ -68,7 +69,7 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
                     Name = name,
                     Type = type_t
                 };
-                attributes.Add(TagAttributeFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
+                attributes.Add(_TagFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
                 attributes.Last().InitializeTag();
             }
             catch (Exception ex)
@@ -96,7 +97,7 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
                 // _outputs.Enqueue($"{tag_infos.Value}");
                 foreach (var tag_info in tag_infos.Value)
                 {
-                    attributes.Add(TagAttributeFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
+                    attributes.Add(_TagFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
                 }
             }
         }
