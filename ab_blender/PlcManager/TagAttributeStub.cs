@@ -37,4 +37,13 @@ class TagAttributeStub : TagAttribute
     {
         return 0; // Stub implementation
     }
+
+    public override int GetDintTagValue(int offset = 0)
+    {
+        return 0;
+    }
+    public override string GetStringTagValue(int offset = 0)
+    {
+        return string.Empty;
+    }
 }
