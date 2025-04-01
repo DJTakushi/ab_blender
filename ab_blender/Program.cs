@@ -11,7 +11,7 @@ class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((hostContext, services) =>
             {
-                services.AddHostedService<AbBlender>();
+                services.AddHostedService<PlcBlender>();
                 services.AddSingleton<IPlcFinder, PlcFinder>();
                 services.AddSingleton<IRabbitMQConnectionManager, RabbitMQConnectionManager>();
                 services.AddSingleton<ITagAttributeFactory, TagAttributeFactory>();

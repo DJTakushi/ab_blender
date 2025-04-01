@@ -5,7 +5,7 @@ public static class AppInfo
     public const string _appVersion = "1.0.0";
 }
 
-public class AbBlender : BackgroundService
+public class PlcBlender : BackgroundService
 {
     private readonly ITagAttributeFactory _tagFactory;
     private readonly IRabbitMQConnectionManager _connectionManager;
@@ -13,7 +13,7 @@ public class AbBlender : BackgroundService
     private readonly Dictionary<string, PlcManager> _tag_managers = []; // TODO : make interfaces
     private readonly Queue<string> _outputs = [];
 
-    public AbBlender(ITagAttributeFactory tagFactory, IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
+    public PlcBlender(ITagAttributeFactory tagFactory, IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
     {
         _tagFactory = tagFactory ?? throw new ArgumentNullException(nameof(tagFactory));
         _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
