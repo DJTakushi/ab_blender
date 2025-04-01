@@ -1,12 +1,10 @@
-
 using libplctag;
 using libplctag.DataTypes;
 
-// TODO : make an interface and factory to replace stubbing
 class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol plc_protocol) : ITagAttribute
 {
     public TagInfo TagInfo = tagInfo;
-    private readonly Tag Tag = new Tag
+    private readonly Tag Tag = new()
     {
         Name = $"{tagInfo.Name}",
         Path = "1,0", // assuming default,
@@ -24,17 +22,11 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
     }
     public virtual void InitializeTag()
     {
-        if (!EnvVarHelper.GetPlcStub())
-        {
-            Tag.Initialize();
-        }
+        Tag.Initialize();
     }
     public virtual void ReadTag()
     {
-        if (!EnvVarHelper.GetPlcStub())
-        {
-            Tag.Read();
-        }
+        Tag.Read();
     }
     public virtual double GetDoubleTagValue(int offset = 0)
     {
@@ -42,57 +34,22 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
     }
     public virtual bool GetBoolTagValue(int offset = 0)
     {
-        if (!EnvVarHelper.GetPlcStub())
-        {
-            return Tag.GetBit(0);
-        }
-        else
-        {
-            return false;
-        }
+        return Tag.GetBit(offset);
     }
     public virtual int GetSintTagValue(int offset = 0)
     {
-        if (!EnvVarHelper.GetPlcStub())
-        {
-            return Tag.GetInt8(offset);
-        }
-        else
-        {
-            return 0;
-        }
+        return Tag.GetInt8(offset);
     }
     public virtual int GetIntTagValue(int offset = 0)
     {
-        if (!EnvVarHelper.GetPlcStub())
-        {
-            return Tag.GetInt16(offset);
-        }
-        else
-        {
-            return 0;
-        }
+        return Tag.GetInt16(offset);
     }
     public virtual int GetDintTagValue(int offset = 0)
     {
-        if (!EnvVarHelper.GetPlcStub())
-        {
-            return Tag.GetInt32(offset);
-        }
-        else
-        {
-            return 0;
-        }
+        return Tag.GetInt32(offset);
     }
     public virtual string GetStringTagValue(int offset = 0)
     {
-        if (!EnvVarHelper.GetPlcStub())
-        {
-            return Tag.GetString(offset);
-        }
-        else
-        {
-            return string.Empty;
-        }
+        return Tag.GetString(offset);
     }
 }
