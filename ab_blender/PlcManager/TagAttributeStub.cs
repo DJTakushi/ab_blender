@@ -1,13 +1,8 @@
 using libplctag;
 using libplctag.DataTypes;
 
-class TagAttributeStub : TagAttribute
+class TagAttributeStub(TagInfo tagInfo, string address, PlcType plc_type, Protocol plc_protocol) : TagAttribute(tagInfo, address, plc_type, plc_protocol)
 {
-    public TagAttributeStub(TagInfo tagInfo, string address, PlcType plc_type, Protocol plc_protocol) : base(tagInfo, address, plc_type, plc_protocol)
-    {
-        // Constructor logic for the stub
-    }
-
     public override void InitializeTag()
     {
         // Stub implementation
