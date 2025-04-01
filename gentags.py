@@ -39,6 +39,6 @@ def csv_to_json(input_csv_file, output_json_file):
 if __name__ == "__main__":
     # You can change these file names as needed
     input_file = "ethip-endpoint.csv"
-    output_file = "ab_blender/tags.json"
+    output_file = "plc_blender/tags.json"
     
     csv_to_json(input_file, output_file)

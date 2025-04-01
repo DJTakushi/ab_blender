@@ -45,7 +45,7 @@ def merge_csv_files(a_file, b_file, output_file):
 
 # Example usage
 try:
-    merge_csv_files('ab_blender/last_data.csv', 'ethip-endpoint.csv', 'output.csv')
+    merge_csv_files('plc_blender/last_data.csv', 'ethip-endpoint.csv', 'output.csv')
     print("Files merged successfully into output.csv")
 except FileNotFoundError as e:
     print(f"Error: One of the input files was not found: {e}")

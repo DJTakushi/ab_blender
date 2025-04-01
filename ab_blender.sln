@@ -2,7 +2,7 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ab_blender", "ab_blender\ab_blender.csproj", "{EEC48A42-129C-4440-B411-85D2592BFC37}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "plc_blender", "plc_blender\plc_blender.csproj", "{EEC48A42-129C-4440-B411-85D2592BFC37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

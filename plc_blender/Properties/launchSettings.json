@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "ab_blender": {
+    "plc_blender": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
