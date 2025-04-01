@@ -56,7 +56,7 @@ class PlcBlender {
 } 
 PlcBlender --* IRabbitMQConnectionManager  : _connectionManager
 PlcBlender --* IPlcFinder : _plcFinder 
-PlcBlender --o  PlcManager : Dictionary[string, PlcManager] _tag_managers
+PlcBlender --o  PlcManager : Dictionary[string, PlcManager] _plc_managers
 
 IPlcFinder <|-- PlcFinder
 IRabbitMQConnectionManager <|-- RabbitMQConnectionManager

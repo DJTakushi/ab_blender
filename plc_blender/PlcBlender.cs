@@ -10,7 +10,7 @@ public class PlcBlender : BackgroundService
     private readonly ITagAttributeFactory _tagFactory;
     private readonly IRabbitMQConnectionManager _connectionManager;
     private readonly IPlcFinder _plcFinder;
-    private readonly Dictionary<string, PlcManager> _tag_managers = []; // TODO : make interfaces
+    private readonly Dictionary<string, PlcManager> _plc_managers = []; // TODO : make interfaces
     private readonly Queue<string> _outputs = [];
 
     public PlcBlender(ITagAttributeFactory tagFactory, IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
@@ -22,7 +22,7 @@ public class PlcBlender : BackgroundService
         string? plc_address_ev = EnvVarHelper.GetPlcAddress();
         if (!string.IsNullOrEmpty(plc_address_ev))
         {
-            _tag_managers.Add(plc_address_ev, new PlcManager(_tagFactory, plc_address_ev, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
+            _plc_managers.Add(plc_address_ev, new PlcManager(_tagFactory, plc_address_ev, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
         }
         else
         {
@@ -35,10 +35,10 @@ public class PlcBlender : BackgroundService
             }
             foreach (string plc_ip in plc_ips)
             {
-                _tag_managers.Add(plc_ip, new PlcManager(_tagFactory, plc_ip, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
+                _plc_managers.Add(plc_ip, new PlcManager(_tagFactory, plc_ip, EnvVarHelper.GetPlcType(), EnvVarHelper.GetPlcProtocol()));
             }
         }
-        foreach (KeyValuePair<string, PlcManager> entry in _tag_managers)
+        foreach (KeyValuePair<string, PlcManager> entry in _plc_managers)
         {
             entry.Value.load_tags();
             Console.WriteLine($"Monitoring {entry.Key}");
@@ -51,7 +51,7 @@ public class PlcBlender : BackgroundService
         {
             try
             {
-                foreach (KeyValuePair<string, PlcManager> entry in _tag_managers)
+                foreach (KeyValuePair<string, PlcManager> entry in _plc_managers)
                 {
                     _outputs.Enqueue(entry.Value.genTagTelemetry());
                 }
