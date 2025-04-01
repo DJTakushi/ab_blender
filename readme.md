@@ -142,6 +142,17 @@ class TagAttribute {
   + GetDintTagValue(int) int
   + GetStringTagValue(int) string
 }
+TagAttribute <|-- TagAttributeStub
+class TagAttributeStub {
+  + InitializeTag()
+  + ReadTag()
+  + GetDoubleTagValue(int) double
+  + GetBoolTagValue(int) bool
+  + GetSintTagValue(int) int
+  + GetIntTagValue(int) int
+  + GetDintTagValue(int) int
+  + GetStringTagValue(int) string
+}
 ```
 
 # 2. use
