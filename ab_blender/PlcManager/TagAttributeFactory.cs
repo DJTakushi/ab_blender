@@ -1,8 +1,8 @@
 using libplctag;
 using libplctag.DataTypes;
-class TagAttributeFactory //: ITagAttributeFactory
+public class TagAttributeFactory : ITagAttributeFactory
 {
-    static public ITagAttribute CreateTagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol plc_protocol)
+    public ITagAttribute CreateTagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol plc_protocol)
     {
         if (EnvVarHelper.GetPlcStub())
         {
