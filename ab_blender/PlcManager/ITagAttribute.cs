@@ -1,4 +1,4 @@
-interface ITagAttribute
+public interface ITagAttribute
 {
     public void InitializeTag();
     public TagType GetTagType();
