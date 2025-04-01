@@ -14,6 +14,14 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
         PlcType = plc_type,
         Protocol = plc_protocol
     };
+    public virtual TagType GetTagType()
+    {
+        return (TagType)TagInfo.Type;
+    }
+    public virtual string GetTagName()
+    {
+        return TagInfo.Name;
+    }
     public virtual void InitializeTag()
     {
         if (!EnvVarHelper.GetPlcStub())

@@ -1,6 +1,8 @@
 interface ITagAttribute
 {
     public void InitializeTag();
+    public TagType GetTagType();
+    public string GetTagName();
     public void ReadTag(); 
     public double GetDoubleTagValue(int offset = 0);
     public bool GetBoolTagValue(int offset = 0);
