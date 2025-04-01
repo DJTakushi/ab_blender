@@ -14,6 +14,7 @@ class Program
                 services.AddHostedService<AbBlender>();
                 services.AddSingleton<IPlcFinder, PlcFinder>();
                 services.AddSingleton<IRabbitMQConnectionManager, RabbitMQConnectionManager>();
+                services.AddSingleton<ITagAttributeFactory, TagAttributeFactory>();
 
                 // services.AddLogging(logging =>
                 // {
