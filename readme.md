@@ -42,59 +42,105 @@ flowchart TD
 ## 1.2 structure
 ```mermaid
 ---
-title: Main
+title: class diagram
 ---
-stateDiagram-v2
+classDiagram
+BackgroundService <|-- PlcBlender
 
-[*] --> LoadTagsFromJson()
-state LoadTagsFromJson()  {
-    state "_tags Deserialized <br>from 'tags.json'" as tags
+class PlcBlender {
+  - ITagAttributeFactory _tagFactory
+  - Queue[string] outputs
+  + PlcBlender()
+  # ExecuteAsync()
+  - publishOutputToRabbitMQ()
+} 
+PlcBlender --* IRabbitMQConnectionManager  : _connectionManager
+PlcBlender --* IPlcFinder : _plcFinder 
+PlcBlender --o  PlcManager : Dictionary[string, PlcManager] _tag_managers
+
+IPlcFinder <|-- PlcFinder
+IRabbitMQConnectionManager <|-- RabbitMQConnectionManager
+ITagAttributeFactory <|-- TagAttributeFactory
+
+class ITagAttributeFactory {
+  + CreateTagAttribute(TagInfo, string, PlcType, Protocol) ITagAttribute 
+}
+<<Interface>> ITagAttributeFactory
+class TagAttributeFactory {
+  + CreateTagAttribute(TagInfo, string, PlcType, Protocol) ITagAttribute
 }
 
-LoadTagsFromJson() --> InitializePlcTags()
-state  InitializePlcTags() {
-    state "loop through _tags, create<br>real tags in _plcTags,<br> and init them" as init
-}   
-
-state "_readTime setup" as _readTimer_setup  {
-    state "_readTimer creation" as _readTimer
-    state "_readTimer.Elapsed<br>+= ReadTags" as  set_readtags
-    _readTimer --> set_readtags
+class IRabbitMQConnectionManager {
+    + IsConfigurable() bool
+    + IsOutputOpen() bool
+    + SetupConnectionsAsync()
+    + PublishOutputToRabbitMQ(string)
 }
-InitializePlcTags() --> _readTimer_setup
-
-_readTimer_setup --> HasRabbitMqConfig()
-HasRabbitMqConfig() -->  _readTimer.Start() : false
-HasRabbitMqConfig() --> rmq_reconnection_setup : true
-state rmq_reconnection_setup{
-    state "_reconnectTimer creation" as _reconnectTimer
-    SetupRabbitMq() --> _reconnectTimer
-
-    state "_reconnectTimer.Elapsed<br>+= ReconnectRabbitMq()" as reconnect_elapsed
-    _reconnectTimer --> reconnect_elapsed
+<<interface>> IRabbitMQConnectionManager
+class RabbitMQConnectionManager {
+  - ConnectionFactory _outputFactory
+  - IConnection _outputConnection
+  - IChannel _outputChannel
+  + IsConfigurable() bool
+  + IsOutputOpen() bool
+  - CreateFactory(string) ConnectionFactory
+  - CreateConnection(ConnectionFactory, string) IConnection
+  + SetupConnectionsAsync()
+  + PublishOutputToRabbitMQ(string)
 }
-rmq_reconnection_setup -->  _readTimer.Start()
+class IPlcFinder {
+  + FindPlc(string, string)
+  + GetPlcIps() string[]
+}
+<<interface>> IPlcFinder
 
-_readTimer.Start() --> loop
-```
-
-```mermaid
----
-title: ReadTags
----
-stateDiagram-v2
-state ReadTags {
-  state loop_through_tags {
-    update_tag
-  }
-  loop_through_tags --> jsonMessage
-  state "jsonMessage creation" as jsonMessage
-
-  state "message published to rmq" as rmq_publish
-  jsonMessage --> rmq_publish :  rmq connected
-
-  state "message printed to console" as console_print
-  jsonMessage --> console_print :  rmq disconnected
+class PlcFinder {
+  + static plc_ips string[]
+  + GetPlcIps() string[]
+  + FindPlc(string, string)
+  - ScanIpRange(string, string)
+  - ScanDevice(string)
+  - CheckPlcPort(string, int, int) bool
+}
+class PlcManager {
+  - string _plc_address
+  - PlcType _plc_type
+  - Protocol _plc_protocol
+  + readAllTags()
+  + load_tags()
+  - LoadTagsFromJson(string, PlcType, Protocol)
+  - identifyPlcTagsWithMapper(string, PlcType, Protocol)
+  + genTagTelemetry() string
+}
+PlcManager --o ITagAttributeFactory : _TagFactory
+PlcManager --o ITagAttribute : Dictionary[string,ITagAttribute] attributes
+class ITagAttribute {
+  + InitializeTag()
+  + GetTagType() TagType
+  + GetTagName() string
+  + ReadTag()
+  + GetDoubleTagValue(int) double
+  + GetBoolTagValue(int) bool
+  + GetSintTagValue(int) int
+  + GetIntTagValue(int) int
+  + GetDintTagValue(int) int
+  + GetStringTagValue(int) string
+}
+<<interface>> ITagAttribute
+ITagAttribute <|-- TagAttribute
+class TagAttribute {
+  + TagInfo TagInfo
+  - Tag Tag
+  + GetTagType() TagType
+  + GetTagName() string
+  + InitializeTag()
+  + ReadTag()
+  + GetDoubleTagValue(int) double
+  + GetBoolTagValue(int) bool
+  + GetSintTagValue(int) int
+  + GetIntTagValue(int) int
+  + GetDintTagValue(int) int
+  + GetStringTagValue(int) string
 }
 ```
 
