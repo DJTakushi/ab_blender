@@ -8,7 +8,7 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
     private readonly string _plc_address = plc_address;
     private readonly PlcType _plc_type = plc_type;
     private readonly Protocol _plc_protocol = plc_protocol;
-    private List<TagAttribute> attributes = []; // TODO : make this a dict so a client can write a tag value
+    private readonly List<ITagAttribute> attributes = []; // TODO : make this a dict so a client can write a tag value
     public void readAllTags()
     {
         foreach (var attr in attributes)
@@ -68,7 +68,7 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
                     Name = name,
                     Type = type_t
                 };
-                attributes.Add(new TagAttribute(tag_info, plc_address, plc_type, plc_protocol));
+                attributes.Add(TagAttributeFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
                 attributes.Last().InitializeTag();
             }
             catch (Exception ex)
@@ -96,7 +96,7 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
                 // _outputs.Enqueue($"{tag_infos.Value}");
                 foreach (var tag_info in tag_infos.Value)
                 {
-                    attributes.Add(new TagAttribute(tag_info, plc_address, plc_type, plc_protocol));
+                    attributes.Add(TagAttributeFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
                 }
             }
         }
@@ -119,36 +119,38 @@ class PlcManager(string plc_address, PlcType plc_type, Protocol plc_protocol)
 
         foreach (var attr in attributes)
         {
+            TagType type = attr.GetTagType();
+            string name = attr.GetTagName();
             try
             {
-                switch (attr.TagInfo.Type)
+                switch (type)
                 {
-                    case (ushort)TagType.REAL:
-                        data["tags"]![attr.TagInfo.Name] = attr.GetDoubleTagValue(0);
+                    case TagType.REAL:
+                        data["tags"]![name] = attr.GetDoubleTagValue(0);
                         break;
-                    case (ushort)TagType.BOOL:
-                        data["tags"]![attr.TagInfo.Name] = attr.GetBoolTagValue(0);
+                    case TagType.BOOL:
+                        data["tags"]![name] = attr.GetBoolTagValue(0);
                         break;
-                    case (ushort)TagType.SINT:
-                        data["tags"]![attr.TagInfo.Name] = attr.GetSintTagValue(0);
+                    case TagType.SINT:
+                        data["tags"]![name] = attr.GetSintTagValue(0);
                         break;
-                    case (ushort)TagType.INT:
-                        data["tags"]![attr.TagInfo.Name] = attr.GetIntTagValue(0);
+                    case TagType.INT:
+                        data["tags"]![name] = attr.GetIntTagValue(0);
                         break;
-                    case (ushort)TagType.DINT:
-                        data["tags"]![attr.TagInfo.Name] = attr.GetDintTagValue(0);
+                    case TagType.DINT:
+                        data["tags"]![name] = attr.GetDintTagValue(0);
                         break;
-                    case (ushort)TagType.STRING:
-                        data["tags"]![attr.TagInfo.Name] = attr.GetStringTagValue(0);
+                    case TagType.STRING:
+                        data["tags"]![name] = attr.GetStringTagValue(0);
                         break;
                     default:
-                        Console.WriteLine($"Unknown type : {attr.TagInfo.Type}");
+                        Console.WriteLine($"Unknown type : {type}");
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in ReadTags for tag '{attr.TagInfo.Name}', type '{attr.TagInfo.Type}' : {ex.Message}");
+                Console.WriteLine($"Error in ReadTags for tag '{name}', type '{type}' : {ex.Message}");
             }
         }
         return data.ToJsonString();
