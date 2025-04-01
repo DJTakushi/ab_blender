@@ -17,7 +17,7 @@ flowchart TD
     tags.json>tags.json]
     style tags.json fill:#0000FF,color:#fff
 
-    plc[/Allen Bradley PLC/]
+    plc[/PLC/]
     style plc fill:#ff0000,color:#fff
 
     console[[console]]
@@ -27,14 +27,14 @@ flowchart TD
     style rmq fill:#ff6600,stroke:#b8b8b8,stroke-width:2px,color:#fff
     style env_var fill:green,color:#fff
 
-    subgraph ab_blender
+    subgraph plc_blender
         tags_
-        tags_ --> is_rmq{rmq?}
+        tags_ --> is_rmq{rmq<br>connected?}
     end
 
-    tags.json --> tags_
-    env_var --> ab_blender
-    plc <-- allen-bradley protocol --> tags_
+    tags.json -.-> tags_
+    env_var --> plc_blender
+    plc <-- plc protocol --> tags_
     is_rmq  -- yes --> rmq[(rmq)]
     is_rmq -- no --> console
 ```
@@ -111,7 +111,7 @@ READ_TAGS_PERIOD_MS=1000
 RABBITMQ_HOST=192.168.130.51
 RABBITMQ_USER=guest
 RABBITMQ_PASS=guest
-RABBITMQ_CONNECTION_NAME=ab_blender
+RABBITMQ_CONNECTION_NAME=plc_blender_output
 RABBITMQ_EXCHANGE=plc_data
 RABBITMQ_ROUTING_KEY=tag_values
 ```
@@ -119,7 +119,7 @@ RABBITMQ_ROUTING_KEY=tag_values
 ## 2.2 local
 from root dir
 ```
-dotnet run --project ab_blender
+dotnet run --project plc_blender
 ```
 
 ## 2.3 containerization
@@ -135,7 +135,7 @@ dotnet publish --arch x64 /t:PublishContainer -p ContainerRegistry=tmvcontainer.
 
 ###  2.3.2 run
 ```
-docker run --env-file .env ab_blender
+docker run --env-file .env plc_blender
 ```
 
 # 3. requirements
