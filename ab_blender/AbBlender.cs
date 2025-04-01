@@ -15,9 +15,9 @@ public class AbBlender : BackgroundService
     private readonly Dictionary<string, PlcManager> _tag_managers = []; // TODO : make interfaces
     private readonly Queue<string> _outputs = [];
 
-    public AbBlender(ITagAttributeFactory _tagFactory, IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
+    public AbBlender(ITagAttributeFactory tagFactory, IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
     {
-        _tagFactory = _tagFactory ?? throw new ArgumentNullException(nameof(_tagFactory));
+        _tagFactory = tagFactory ?? throw new ArgumentNullException(nameof(tagFactory));
         _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
         _plcFinder = plcFinder ?? throw new ArgumentNullException(nameof(plcFinder));
 
