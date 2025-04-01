@@ -15,7 +15,7 @@ class TagAttributeStub(TagInfo tagInfo, string address, PlcType plc_type, Protoc
 
     public override double GetDoubleTagValue(int offset = 0)
     {
-        return 0.0; // Stub implementation
+        return 1.2; // Stub implementation
     }
 
     public override bool GetBoolTagValue(int offset = 0)
@@ -25,20 +25,20 @@ class TagAttributeStub(TagInfo tagInfo, string address, PlcType plc_type, Protoc
 
     public override int GetSintTagValue(int offset = 0)
     {
-        return 0; // Stub implementation
+        return 1; // Stub implementation
     }
 
     public override int GetIntTagValue(int offset = 0)
     {
-        return 0; // Stub implementation
+        return 2; // Stub implementation
     }
 
     public override int GetDintTagValue(int offset = 0)
     {
-        return 0;
+        return 3;
     }
     public override string GetStringTagValue(int offset = 0)
     {
-        return string.Empty;
+        return "dummy";
     }
 }
