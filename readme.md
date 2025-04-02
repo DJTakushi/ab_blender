@@ -208,3 +208,10 @@ If the RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASS, RABBITMQ_EXCHANGE, and RABBI
 - built with `dotnet new console -o query_console -n query_conole`
 - https://www.nuget.org/packages/libplctag/
   - example of use
+- 2025-04-02 notes
+  - create a way to cache data
+  - isolate read / publish threads
+  - should lower rates of certain attributes
+  - we want ALL the information on the backend
+    -  van NEEDS cetain things more frequently
+  - batch reads not supported by Eth/IP
