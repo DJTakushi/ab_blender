@@ -209,8 +209,12 @@ If the RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASS, RABBITMQ_EXCHANGE, and RABBI
 - https://www.nuget.org/packages/libplctag/
   - example of use
 - 2025-04-02 notes
-  - create a way to cache data
-  - isolate read / publish threads
+  - [x] create a way to cache data already is
+  - [ ] separated read / publish threads
+  - [ ] "updated" property for each attribute for sparkplugB
+    - [ ] update_ts and published_ts can be used for this
+  - [ ] "changed" property
+    - [ ] old_val
   - should lower rates of certain attributes
   - we want ALL the information on the backend
     -  van NEEDS cetain things more frequently
