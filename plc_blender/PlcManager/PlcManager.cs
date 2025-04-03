@@ -14,7 +14,7 @@ class PlcManager(ITagAttributeFactory tag_factory, string plc_address, PlcType p
     {
         foreach (KeyValuePair<string, ITagAttribute> attr in attributes)
         {
-            attr.Value .ReadTag();
+            attr.Value.ReadTag();
         }
     }
     public void load_tags()

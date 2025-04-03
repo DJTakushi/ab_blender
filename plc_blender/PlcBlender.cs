@@ -11,7 +11,6 @@ public class PlcBlender : BackgroundService
     private readonly IRabbitMQConnectionManager _connectionManager;
     private readonly IPlcFinder _plcFinder;
     private readonly Dictionary<string, PlcManager> _plc_managers = []; // TODO : make interfaces
-    private readonly Queue<string> _outputs = [];
 
     public PlcBlender(ITagAttributeFactory tagFactory, IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
     {
@@ -53,18 +52,8 @@ public class PlcBlender : BackgroundService
             {
                 foreach (KeyValuePair<string, PlcManager> entry in _plc_managers)
                 {
-                    _outputs.Enqueue(entry.Value.genTagTelemetry());
+                    entry.Value.readAllTags();
                 }
-                if (_connectionManager.IsConfigurable())
-                {
-                    await _connectionManager.SetupConnectionsAsync();
-                    publishOutputToRabbitMQ();
-                }
-                while (_outputs.Count > 0)
-                {
-                    Console.WriteLine($"{_outputs.Dequeue()}");
-                }
-
                 await Task.Delay(EnvVarHelper.GetReadTagsPeriodMs(), stoppingToken);
             }
             catch (Exception ex)
@@ -73,16 +62,13 @@ public class PlcBlender : BackgroundService
             }
         }
     }
-
-    private void publishOutputToRabbitMQ()
+    public Queue<string> GetTelemetryMessages()
     {
-        if (_connectionManager.IsOutputOpen())
+        Queue<string> outputs = [];
+        foreach (KeyValuePair<string, PlcManager> entry in _plc_managers)
         {
-            while (_outputs.Count > 0)
-            {
-                _connectionManager.PublishOutputToRabbitMQ(_outputs.Dequeue());
-            }
+            outputs.Enqueue(entry.Value.genTagTelemetry());
         }
+        return outputs;
     }
-
 }
