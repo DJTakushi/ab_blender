@@ -8,14 +8,12 @@ public static class AppInfo
 public class PlcBlender : BackgroundService
 {
     private readonly ITagAttributeFactory _tagFactory;
-    private readonly IRabbitMQConnectionManager _connectionManager;
     private readonly IPlcFinder _plcFinder;
     private readonly Dictionary<string, PlcManager> _plc_managers = []; // TODO : make interfaces
 
-    public PlcBlender(ITagAttributeFactory tagFactory, IRabbitMQConnectionManager connectionManager, IPlcFinder plcFinder)
+    public PlcBlender(ITagAttributeFactory tagFactory, IPlcFinder plcFinder)
     {
         _tagFactory = tagFactory ?? throw new ArgumentNullException(nameof(tagFactory));
-        _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
         _plcFinder = plcFinder ?? throw new ArgumentNullException(nameof(plcFinder));
 
         string? plc_address_ev = EnvVarHelper.GetPlcAddress();
