@@ -71,6 +71,7 @@ class PlcManager(ITagAttributeFactory tag_factory, string plc_address, PlcType p
                 };
                 attributes.Add(name, _TagFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
                 attributes[name].InitializeTag();
+                attributes[name].SetMonitored(true);
             }
             catch (Exception ex)
             {
