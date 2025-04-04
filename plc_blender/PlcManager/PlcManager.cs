@@ -20,10 +20,7 @@ class PlcManager(ITagAttributeFactory tag_factory, string plc_address, PlcType p
     public void load_tags()
     {
         LoadTagsFromJson(_plc_address, _plc_type, _plc_protocol);
-        if (attributes.Count > 0)
-        {
-            identifyPlcTagsWithMapper(_plc_address, _plc_type, _plc_protocol);
-        }
+        identifyPlcTagsWithMapper(_plc_address, _plc_type, _plc_protocol);
     }
     private void LoadTagsFromJson(string plc_address, PlcType plc_type, Protocol plc_protocol)
     {
