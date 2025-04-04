@@ -12,7 +12,9 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
         PlcType = plc_type,
         Protocol = plc_protocol
     };
+    protected byte[] buffer_cached_ = [];
     protected DateTime lastRead_ = new(0);
+    protected DateTime lastChanged_ = new(0);
     protected DateTime lastAccessed_ = new(0);
     public virtual TagType GetTagType()
     {
@@ -30,6 +32,11 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
     {
         Tag.Read();
         lastRead_ = DateTime.Now;
+        byte[] buffer_temp = Tag.GetBuffer();
+        if (buffer_cached_ != buffer_temp){
+            buffer_cached_ = buffer_temp;
+            lastChanged_ = DateTime.Now;
+        }
     }
     public virtual double GetDoubleTagValue(int offset = 0)
     {
