@@ -5,7 +5,9 @@
         }
     ],
     "settings": {
-        "workbench.colorTheme": "Gruvbox Dark Hard",
+        "window.autoDetectColorScheme": true,
+        "Workbench: Preferred Dark Color Theme": "Gruvbox Dark Hard",
+        "Workbench: Preferred Light Color Theme": "Default High Contrast Light",
         // "editor.tabSize": 2,
         "editor.renderWhitespace": "all",
         "editor.rulers": [
