@@ -12,6 +12,8 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
         PlcType = plc_type,
         Protocol = plc_protocol
     };
+    protected DateTime lastRead_ = new(0);
+    protected DateTime lastAccessed_ = new(0);
     public virtual TagType GetTagType()
     {
         return (TagType)TagInfo.Type;
@@ -27,29 +29,36 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
     public virtual void ReadTag()
     {
         Tag.Read();
+        lastRead_ = DateTime.Now;
     }
     public virtual double GetDoubleTagValue(int offset = 0)
     {
+        lastAccessed_ = DateTime.Now;
         return Tag.GetFloat32(offset);
     }
     public virtual bool GetBoolTagValue(int offset = 0)
     {
+        lastAccessed_ = DateTime.Now;
         return Tag.GetBit(offset);
     }
     public virtual int GetSintTagValue(int offset = 0)
     {
+        lastAccessed_ = DateTime.Now;
         return Tag.GetInt8(offset);
     }
     public virtual int GetIntTagValue(int offset = 0)
     {
+        lastAccessed_ = DateTime.Now;
         return Tag.GetInt16(offset);
     }
     public virtual int GetDintTagValue(int offset = 0)
     {
+        lastAccessed_ = DateTime.Now;
         return Tag.GetInt32(offset);
     }
     public virtual string GetStringTagValue(int offset = 0)
     {
+        lastAccessed_ = DateTime.Now;
         return Tag.GetString(offset);
     }
 }
