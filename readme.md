@@ -216,9 +216,10 @@ If the RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASS, RABBITMQ_EXCHANGE, and RABBI
   - [x] "changed" property for eventual sparkplugb
     - [x] old_val/buffer
   - [ ] rate configuration ; should lower rates of certain attributes
-    - [ ] attribute monitor type
+    - [x] attribute monitor type
     - [ ] construct types from json first
     - [ ] secondary DataPublisher with separate rate
+    - [ ] dataPublisher for slow content
   - we want ALL the information on the backend
     -  van NEEDS cetain things more frequently
   - batch reads not supported by Eth/IP
