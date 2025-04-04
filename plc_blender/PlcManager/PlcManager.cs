@@ -9,7 +9,7 @@ class PlcManager(ITagAttributeFactory tag_factory, string plc_address, PlcType p
     private readonly string _plc_address = plc_address;
     private readonly PlcType _plc_type = plc_type;
     private readonly Protocol _plc_protocol = plc_protocol;
-    private readonly Dictionary<string,ITagAttribute> attributes = [];
+    private readonly Dictionary<string, ITagAttribute> attributes = [];
     public void readAllTags()
     {
         foreach (KeyValuePair<string, ITagAttribute> attr in attributes)
@@ -69,7 +69,7 @@ class PlcManager(ITagAttributeFactory tag_factory, string plc_address, PlcType p
                     Name = name,
                     Type = type_t
                 };
-                attributes.Add(name,_TagFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
+                attributes.Add(name, _TagFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
                 attributes[name].InitializeTag();
             }
             catch (Exception ex)
@@ -97,7 +97,7 @@ class PlcManager(ITagAttributeFactory tag_factory, string plc_address, PlcType p
                 // _outputs.Enqueue($"{tag_infos.Value}");
                 foreach (var tag_info in tag_infos.Value)
                 {
-                    attributes.Add(tag_info.Name,_TagFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
+                    attributes.Add(tag_info.Name, _TagFactory.CreateTagAttribute(tag_info, plc_address, plc_type, plc_protocol));
                 }
             }
         }
@@ -118,35 +118,38 @@ class PlcManager(ITagAttributeFactory tag_factory, string plc_address, PlcType p
             ["tags"] = new JsonObject()
         };
 
-        foreach (KeyValuePair<string,ITagAttribute> attr in attributes)
+        foreach (KeyValuePair<string, ITagAttribute> attr in attributes)
         {
             TagType type = attr.Value.GetTagType();
             string name = attr.Value.GetTagName();
             try
             {
-                switch (type)
+                if (attr.Value.IsChanged())
                 {
-                    case TagType.REAL:
-                        data["tags"]![name] = attr.Value.GetDoubleTagValue(0);
-                        break;
-                    case TagType.BOOL:
-                        data["tags"]![name] = attr.Value.GetBoolTagValue(0);
-                        break;
-                    case TagType.SINT:
-                        data["tags"]![name] = attr.Value.GetSintTagValue(0);
-                        break;
-                    case TagType.INT:
-                        data["tags"]![name] = attr.Value.GetIntTagValue(0);
-                        break;
-                    case TagType.DINT:
-                        data["tags"]![name] = attr.Value.GetDintTagValue(0);
-                        break;
-                    case TagType.STRING:
-                        data["tags"]![name] = attr.Value.GetStringTagValue(0);
-                        break;
-                    default:
-                        Console.WriteLine($"Unknown type : {type}");
-                        break;
+                    switch (type)
+                    {
+                        case TagType.REAL:
+                            data["tags"]![name] = attr.Value.GetDoubleTagValue(0);
+                            break;
+                        case TagType.BOOL:
+                            data["tags"]![name] = attr.Value.GetBoolTagValue(0);
+                            break;
+                        case TagType.SINT:
+                            data["tags"]![name] = attr.Value.GetSintTagValue(0);
+                            break;
+                        case TagType.INT:
+                            data["tags"]![name] = attr.Value.GetIntTagValue(0);
+                            break;
+                        case TagType.DINT:
+                            data["tags"]![name] = attr.Value.GetDintTagValue(0);
+                            break;
+                        case TagType.STRING:
+                            data["tags"]![name] = attr.Value.GetStringTagValue(0);
+                            break;
+                        default:
+                            Console.WriteLine($"Unknown type : {type}");
+                            break;
+                    }
                 }
             }
             catch (Exception ex)
