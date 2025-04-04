@@ -11,7 +11,9 @@ class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((hostContext, services) =>
             {
-                services.AddHostedService<PlcBlender>();
+                services.AddSingleton<PlcBlender>(); // must be singleton to be picked up by DataPublisher
+                services.AddHostedService(provider => provider.GetRequiredService<PlcBlender>());
+                services.AddHostedService<DataPublisher>();
                 services.AddSingleton<IPlcFinder, PlcFinder>();
                 services.AddSingleton<IRabbitMQConnectionManager, RabbitMQConnectionManager>();
                 services.AddSingleton<ITagAttributeFactory, TagAttributeFactory>();
