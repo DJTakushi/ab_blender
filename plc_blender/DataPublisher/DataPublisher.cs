@@ -35,7 +35,7 @@ public class DataPublisher : BackgroundService
                         Console.WriteLine(output);
                     }
                 }
-                await Task.Delay(EnvVarHelper.GetReadTagsPeriodMs(), stoppingToken);
+                await Task.Delay(EnvVarHelper.GetPublishMonitoredTagsPeriodMs(), stoppingToken);
             }
             catch (Exception ex)
             {

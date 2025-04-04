@@ -50,7 +50,7 @@ public class PlcBlender : BackgroundService
                 {
                     entry.Value.readAllTags();
                 }
-                await Task.Delay(EnvVarHelper.GetReadTagsPeriodMs(), stoppingToken);
+                await Task.Delay(EnvVarHelper.GetReadMonitoredTagsPeriodMs(), stoppingToken);
             }
             catch (Exception ex)
             {
