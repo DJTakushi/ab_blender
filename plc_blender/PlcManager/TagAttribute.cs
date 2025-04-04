@@ -12,10 +12,10 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
         PlcType = plc_type,
         Protocol = plc_protocol
     };
-    protected byte[] buffer_cached_ = [];
     protected DateTime lastRead_ = new(0);
-    protected DateTime lastChanged_ = new(0);
     protected DateTime lastAccessed_ = new(0);
+    protected byte[] buffer_cached_ = [];
+    protected DateTime lastChanged_ = new(0);
     public virtual TagType GetTagType()
     {
         return (TagType)TagInfo.Type;
