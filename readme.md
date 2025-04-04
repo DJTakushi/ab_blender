@@ -213,9 +213,12 @@ If the RABBITMQ_HOST, RABBITMQ_USER, RABBITMQ_PASS, RABBITMQ_EXCHANGE, and RABBI
   - [x] separated read / publish threads
   - [ ] "updated" property for each attribute for sparkplugB
     - [ ] update_ts and published_ts can be used for this
-  - [ ] "changed" property for eventual sparkplugb
-    - [ ] old_val
+  - [x] "changed" property for eventual sparkplugb
+    - [x] old_val/buffer
   - [ ] rate configuration ; should lower rates of certain attributes
+    - [ ] attribute monitor type
+    - [ ] construct types from json first
+    - [ ] secondary DataPublisher with separate rate
   - we want ALL the information on the backend
     -  van NEEDS cetain things more frequently
   - batch reads not supported by Eth/IP
