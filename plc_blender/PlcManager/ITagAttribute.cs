@@ -11,4 +11,6 @@ public interface ITagAttribute
     public int GetDintTagValue(int offset = 0);
     public string GetStringTagValue(int offset = 0);
     public bool IsChanged();
+    public bool IsMonitored();
+    public void SetMonitored(bool should_monitor);
 }

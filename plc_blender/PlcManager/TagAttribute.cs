@@ -16,6 +16,7 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
     protected DateTime lastAccessed_ = new(0);
     protected byte[] buffer_cached_ = [];
     protected DateTime lastChanged_ = new(0);
+    protected bool is_monitored_ = false;
     public virtual TagType GetTagType()
     {
         return (TagType)TagInfo.Type;
@@ -72,6 +73,14 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
     public bool IsChanged()
     {
         return lastAccessed_ < lastChanged_;
+    }
+    public bool IsMonitored()
+    {
+        return is_monitored_;
+    }
+    public void SetMonitored(bool should_monitor)
+    {
+        is_monitored_ = should_monitor;
     }
 
 }
