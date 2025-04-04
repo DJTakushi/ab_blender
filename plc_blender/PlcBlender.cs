@@ -1,5 +1,3 @@
-using RmqConnection;
-
 public static class AppInfo
 {
     public const string _appVersion = "1.0.0";
