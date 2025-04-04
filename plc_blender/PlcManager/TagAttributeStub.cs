@@ -6,6 +6,7 @@ class TagAttributeStub(TagInfo tagInfo, string address, PlcType plc_type, Protoc
     public override void InitializeTag()
     {
         // Stub implementation
+        lastChanged_ = DateTime.Now;
     }
 
     public override void ReadTag()
