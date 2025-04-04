@@ -10,4 +10,5 @@ public interface ITagAttribute
     public int GetIntTagValue(int offset = 0);
     public int GetDintTagValue(int offset = 0);
     public string GetStringTagValue(int offset = 0);
+    public bool IsChanged();
 }

@@ -33,7 +33,8 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
         Tag.Read();
         lastRead_ = DateTime.Now;
         byte[] buffer_temp = Tag.GetBuffer();
-        if (buffer_cached_ != buffer_temp){
+        if (buffer_cached_ != buffer_temp)
+        {
             buffer_cached_ = buffer_temp;
             lastChanged_ = DateTime.Now;
         }
@@ -68,4 +69,9 @@ class TagAttribute(TagInfo tagInfo, string address, PlcType plc_type, Protocol p
         lastAccessed_ = DateTime.Now;
         return Tag.GetString(offset);
     }
+    public bool IsChanged()
+    {
+        return lastAccessed_ < lastChanged_;
+    }
+
 }
